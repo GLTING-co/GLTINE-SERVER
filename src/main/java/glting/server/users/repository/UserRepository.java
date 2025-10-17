@@ -23,6 +23,13 @@ public class UserRepository {
         userJpaRepository.flush();
     }
 
+    /**
+     * 소셜 ID와 소셜 타입(KAKAO, NAVER, GOOGLE)에 따라 사용자를 조회합니다.
+     *
+     * @param socialId 소셜 플랫폼 사용자 ID
+     * @param type     소셜 플랫폼 종류 (KAKAO, NAVER, GOOGLE)
+     * @return 해당 소셜 계정에 연결된 사용자 엔티티
+     */
     public Optional<UserEntity> findBySocialId(Long socialId, String type) {
         QUserEntity userEntity = QUserEntity.userEntity;
 

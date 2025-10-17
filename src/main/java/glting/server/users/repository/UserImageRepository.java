@@ -12,6 +12,12 @@ public class UserImageRepository {
     private final UserImageJpaRepository userImageJpaRepository;
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * 사용자 이미지 URL 목록을 일괄 저장합니다.
+     *
+     * @param userSeq   사용자 식별자
+     * @param imageUrls S3 등에 업로드된 이미지 URL 목록
+     */
     public void saveAllUserImageUrls(Long userSeq, List<String> imageUrls) {
         final String sql = """
                 INSERT INTO user_image (user_seq, image, deleted)

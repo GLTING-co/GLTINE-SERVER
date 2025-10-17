@@ -27,6 +27,12 @@ public class UserService {
 
     private final CommonService commonService;
 
+    /**
+     * 비회원(소셜 로그인 미가입자) 회원가입을 처리합니다.
+     *
+     * @param request 회원가입 요청 데이터 (소셜 타입, 이름, 성별 등)
+     * @param images  프로필 이미지 MultipartFile 리스트
+     */
     @Transactional
     public void registerUser(NoAccountRequest request, List<MultipartFile> images) {
         userRepository.findBySocialId(request.id(), request.type().toUpperCase())
