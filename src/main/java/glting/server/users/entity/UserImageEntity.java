@@ -3,6 +3,7 @@ package glting.server.users.entity;
 import glting.server.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -29,6 +30,7 @@ public class UserImageEntity extends BaseTimeEntity {
     @Column(name = "image", nullable = false)
     private String image;
 
+    @Builder.Default
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean deleted = false;
 }
