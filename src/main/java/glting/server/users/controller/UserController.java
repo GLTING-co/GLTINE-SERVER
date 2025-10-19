@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +38,7 @@ public class UserController {
             operationId = "1",
             summary = "소셜 로그인/회원가입 API Description - 필독!",
             description = """
-                    회원가입 여부에 따라 반환값이 다릅니다.
+                    소셜 로그인 시, 회원가입 여부에 따라 반환값이 다릅니다.
                     <br><br>
                     ### 회원가입이 되어 있는 사용자의 경우
                     ```
@@ -60,7 +61,11 @@ public class UserController {
     public void description() {
     }
 
-    @PostMapping("/register")
+    @PostMapping(
+            value = "/register",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @Operation(summary = "소셜로그인 비회원 회원가입 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
