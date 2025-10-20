@@ -7,6 +7,7 @@ import glting.server.users.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -51,5 +52,11 @@ public class UserRepository {
                 .fetchOne();
 
         return Optional.ofNullable(result);
+    }
+
+
+    public List<UserEntity> testMyBatis() {
+
+        return userMapper.findAll();
     }
 }
