@@ -74,4 +74,9 @@ public class UserService {
             );
         }
     }
+
+    public List<UserEntity> testMyBatis() {
+
+        return userRepository.testMyBatis();
+    }
 }

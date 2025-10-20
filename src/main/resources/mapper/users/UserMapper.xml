@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="glting.server.users.repository.UserMapper">
+
+    <resultMap id="userMap" type="glting.server.users.entity.UserEntity">
+        <id property="userSeq" column="user_seq"/>
+        <result property="name" column="name"/>
+        <result property="birth" column="birth"/>
+        <result property="gender" column="gender"/>
+        <result property="sexualType" column="sexual_type"/>
+        <result property="relationship" column="relationship"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="userMap">
+        SELECT * FROM USER
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="userMap">
+        SELECT * FROM USER WHERE user_seq = #{userSeq}
+    </select>
+
+    <insert id="insertUser" parameterType="glting.server.users.entity.UserEntity" useGeneratedKeys="true" keyProperty="userSeq">
+        INSERT INTO USER (name, birth, gender, sexual_type, relationship)
+        VALUES (#{name}, #{birth}, #{gender}, #{sexualType}, #{relationship})
+    </insert>
+
+</mapper>

@@ -14,6 +14,7 @@ import java.util.Optional;
 public class UserRepository {
     private final UserJpaRepository userJpaRepository;
     private final JPAQueryFactory queryFactory;
+    private final UserMapper userMapper;
 
     public UserEntity saveUserEntity(UserEntity userEntity) {
         return userJpaRepository.save(userEntity);
