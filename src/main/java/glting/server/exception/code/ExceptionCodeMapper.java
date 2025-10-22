@@ -20,7 +20,7 @@ public class ExceptionCodeMapper {
         CONFLICT_MAP.put("동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.", "CONFLICT_EXCEPTION_002");
 
         // NotFoundException
-        NOT_FOUND_MAP.put("카카오에 회원가입 되지 않은 회원입니다.", "NOT_FOUND_EXCEPTION_001");
+        NOT_FOUND_MAP.put("", "NOT_FOUND_EXCEPTION_001");
 
         // ServerException
         SERVER_MAP.put("카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_001");
@@ -35,7 +35,7 @@ public class ExceptionCodeMapper {
         return switch (type) {
             case BAD_REQUEST -> BAD_REQUEST_MAP.getOrDefault(message, "BAD_REQUEST_EXCEPTION_예외코드 설정하세요.");
             case CONFLICT -> CONFLICT_MAP.getOrDefault(message, "CONFLICT_EXCEPTION_예외코드 설정하세요.");
-            case NOT_FOUND -> NOT_FOUND_MAP.getOrDefault(message, "NOT_FOUNE_EXCEPTION_예외코드 설정하세요.");
+            case NOT_FOUND -> NOT_FOUND_MAP.getOrDefault(message, "NOT_FOUND_EXCEPTION_예외코드 설정하세요.");
             case SERVER -> SERVER_MAP.getOrDefault(message, "SERVER_EXCEPTION_예외코드 설정하세요.");
             case UNAUTHORIZED -> UNAUTHORIZED_MAP.getOrDefault(message, "UNAUTHORIZED_EXCEPTION_예외코드 설정하세요.");
         };

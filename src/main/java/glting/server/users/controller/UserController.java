@@ -111,7 +111,6 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "SERVER_EXCEPTION_001", description = "카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "SERVER_EXCEPTION_002", description = "카카오 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "SERVER_EXCEPTION_003", description = "카카오에 회원가입 되지 않은 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public Mono<BaseResponse<?>> loginKakao(@RequestParam(name = "code") String code) {
         return kakaoService.loginKakao(code)
