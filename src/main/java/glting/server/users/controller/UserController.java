@@ -4,6 +4,7 @@ import glting.server.base.BaseResponse;
 import glting.server.exception.BadRequestException;
 import glting.server.exception.handler.GlobalExceptionHandler;
 import glting.server.social.kakao.service.KakaoService;
+import glting.server.social.naver.service.NaverService;
 import glting.server.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,6 +33,7 @@ import static glting.server.users.controller.vo.request.UserRequest.*;
 public class UserController {
     private final UserService userService;
     private final KakaoService kakaoService;
+    private final NaverService naverService;
 
     @GetMapping("/A")
     @Operation(
@@ -114,6 +116,18 @@ public class UserController {
     })
     public Mono<BaseResponse<?>> loginKakao(@RequestParam(name = "code") String code) {
         return kakaoService.loginKakao(code)
+                .map(response -> BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
+    }
+
+    @PostMapping("/login/naver")
+    @Operation(summary = "네이버 로그인 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "SERVER_EXCEPTION_004", description = "네이버 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "SERVER_EXCEPTION_005", description = "네이버 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public Mono<BaseResponse<?>> loginNaver(@RequestParam(name = "code") String code) {
+        return naverService.loginNaver(code)
                 .map(response -> BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 }

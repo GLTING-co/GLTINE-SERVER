@@ -1,22 +1,17 @@
 package glting.server.social.kakao.domain;
 
-import java.time.Duration;
-
 import glting.server.exception.ServerException;
+import glting.server.config.WebClientConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
 
 import static glting.server.exception.code.ExceptionCodeMapper.*;
 import static glting.server.exception.code.ExceptionCodeMapper.getCode;
@@ -32,30 +27,8 @@ public class KakaoDomain {
     @Value("${kakao.oauth.redirect-uri}")
     private String kakaoRedirectURL;
 
-    private final WebClient kakaoWebClient = createWebClient(KAKAO_AUTH_BASE_URL);
-    private final WebClient kakaoApiWebClient = createWebClient(KAKAO_API_BASE_URL);
+    private final WebClientConfig webClientConfig;
 
-    /**
-     * 카카오 API 호출을 위한 WebClient 인스턴스를 생성합니다.
-     *
-     * @param baseUrl 대상 베이스 URL
-     * @return 구성된 WebClient
-     */
-    private WebClient createWebClient(String baseUrl) {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(10));
-
-        ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(1024 * 1024))
-                .build();
-
-        return WebClient.builder()
-                .baseUrl(baseUrl)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .exchangeStrategies(strategies)
-                .defaultHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-                .build();
-    }
 
     /**
      * 인가 코드로 카카오 액세스/리프레시 토큰을 발급받습니다.
@@ -71,7 +44,7 @@ public class KakaoDomain {
             form.add("redirect_uri", kakaoRedirectURL);
             form.add("code", code);
 
-            return kakaoWebClient.post()
+            return webClientConfig.createWebClient(KAKAO_AUTH_BASE_URL).post()
                     .uri("/oauth/token")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(form))
@@ -111,7 +84,7 @@ public class KakaoDomain {
 
     public Mono<KakaoUserResponse> getKakaoUser(String accessToken) {
         try {
-            return kakaoApiWebClient.get()
+            return webClientConfig.createWebClient(KAKAO_API_BASE_URL).get()
                     .uri("/v2/user/me")
                     .headers(h -> h.setBearerAuth(accessToken))
                     .accept(MediaType.APPLICATION_JSON)
@@ -149,7 +122,7 @@ public class KakaoDomain {
      */
     public Mono<KakaoUserResponse> logout(String accessToken) {
         try {
-            return kakaoApiWebClient.post()
+            return webClientConfig.createWebClient(KAKAO_API_BASE_URL).post()
                     .uri("/v1/user/logout")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .headers(h -> h.setBearerAuth(accessToken))

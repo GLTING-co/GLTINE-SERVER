@@ -25,7 +25,10 @@ public class ExceptionCodeMapper {
         // ServerException
         SERVER_MAP.put("카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_001");
         SERVER_MAP.put("카카오 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_002");
-        SERVER_MAP.put("카카오 로그아웃 호출 중 오류가 발생했습니다.", "SERVER_EXCEPTION_002");
+        SERVER_MAP.put("카카오 로그아웃 호출 중 오류가 발생했습니다.", "SERVER_EXCEPTION_003");
+        SERVER_MAP.put("네이버 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_004");
+        SERVER_MAP.put("네이버 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_005");
+        SERVER_MAP.put("네이버 로그아웃 호출 중 오류가 발생했습니다.", "SERVER_EXCEPTION_006");
 
         // UnauthorizedException
         UNAUTHORIZED_MAP.put("", "UNAUTHORIZED_EXCEPTION_001");
