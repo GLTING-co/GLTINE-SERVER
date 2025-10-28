@@ -1,0 +1,128 @@
+name: glting CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17'
+
+      # DEVELOP 용 YML
+      - name: Set YML for DEVELOP
+        if: github.base_ref == 'develop' || github.ref == 'refs/heads/develop'
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML_TEST }}" | base64 --decode > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_TEST_YML }}" | base64 --decode > src/main/resources/application-test.yml
+
+#      # PRODUCTION 용 YML
+#      - name: Set YML for PRODUCTION
+#        if: github.base_ref == 'master' || github.ref == 'refs/heads/master'
+#        run: |
+#          mkdir -p src/main/resources
+#          echo "${{ secrets.APPLICATION_YML_PRODUCTION }}" | base64 --decode > src/main/resources/application.yml
+#          echo "${{ secrets.APPLICATION_PRODUCTION_YML }}" | base64 --decode > src/main/resources/application-production.yml
+
+
+      # Gradle Build
+      - name: Grant execute permission for Gradle
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      # Docker Config
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and Push Docker Image (DEVELOP)
+        if: github.base_ref == 'develop' || github.ref == 'refs/heads/develop'
+        env:
+          NAME: ${{ secrets.DOCKER_USERNAME }}
+          REPO: startwith-develop
+        run: |
+          docker build -t $REPO .
+          docker tag $REPO:latest $NAME/$REPO:latest
+          docker push $NAME/$REPO:latest
+
+#      - name: Build and Push Docker Image (PRODUCTION)
+#        if: github.base_ref == 'master' || github.ref == 'refs/heads/master'
+#        env:
+#          NAME: ${{ secrets.DOCKER_USERNAME }}
+#          REPO: startwith-prod   # 운영 서버용 별도 리포지토리
+#        run: |
+#          docker build -t $REPO .
+#          docker tag $REPO:latest $NAME/$REPO:latest
+#          docker push $NAME/$REPO:latest
+
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH Key
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2_key.pem
+          chmod 600 ec2_key.pem
+
+      - name: Set Docker permissions
+        run: |
+          sudo usermod -aG docker $USER
+          sudo chown $USER /var/run/docker.sock
+          newgrp docker
+
+      - name: Clean up Docker to free space
+        run: |
+          sudo docker container prune -f
+          sudo docker image prune -a -f
+          sudo docker volume prune -f
+          sudo docker network prune -f
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo apt-get clean
+          sudo apt-get autoremove
+
+      # 배포할 서버 선택 (develop → 테스트 서버, master → 운영 서버)
+      - name: Deploy to DEVELOP EC2
+        if: github.base_ref == 'develop' || github.ref == 'refs/heads/develop'
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.TEST_EC2_IP }} << 'EOF'
+            sudo docker container prune -f
+            sudo docker image prune -a -f
+            sudo docker volume prune -f
+            sudo docker network prune -f
+
+            sudo docker ps -q --filter "name=gliting-develop" | grep -q . && sudo docker stop "gliting-develop" && sudo docker rm "gliting-develop"
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/gliting-develop:latest
+            sudo docker run -d --name gliting-develop --rm -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/gliting-develop:latest
+          EOF
+
+#      - name: Deploy to PROD EC2
+#        if: github.base_ref == 'master' || github.ref == 'refs/heads/master'
+#        run: |
+#          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.PROD_EC2_IP }} << 'EOF'
+#            sudo docker container prune -f
+#            sudo docker image prune -a -f
+#            sudo docker volume prune -f
+#            sudo docker network prune -f
+#
+#            sudo docker ps -q --filter "name=startwith-prod" | grep -q . && sudo docker stop "startwith-prod" && sudo docker rm "startwith-prod"
+#            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/startwith-prod:latest
+#            sudo docker run -d --name startwith-prod --rm -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/startwith-prod:latest
+#          EOF
