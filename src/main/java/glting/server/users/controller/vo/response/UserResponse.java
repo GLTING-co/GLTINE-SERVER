@@ -9,7 +9,7 @@ public class UserResponse {
 
     public record NoAccountResponse(
             String type,
-            Long id
+            String id
     ) {
     }
 }
