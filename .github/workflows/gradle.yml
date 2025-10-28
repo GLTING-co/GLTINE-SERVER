@@ -55,7 +55,7 @@ jobs:
         if: github.base_ref == 'develop' || github.ref == 'refs/heads/develop'
         env:
           NAME: ${{ secrets.DOCKER_USERNAME }}
-          REPO: startwith-develop
+          REPO: gliting-develop
         run: |
           docker build -t $REPO .
           docker tag $REPO:latest $NAME/$REPO:latest
