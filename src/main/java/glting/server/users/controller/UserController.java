@@ -126,8 +126,8 @@ public class UserController {
             @ApiResponse(responseCode = "SERVER_EXCEPTION_004", description = "네이버 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "SERVER_EXCEPTION_005", description = "네이버 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public Mono<BaseResponse<?>> loginNaver(@RequestParam(name = "code") String code) {
-        return naverService.loginNaver(code)
+    public Mono<BaseResponse<?>> loginNaver(@RequestParam(name = "accessToken") String accessToken) {
+        return naverService.loginNaver(accessToken)
                 .map(response -> BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 }

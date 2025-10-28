@@ -20,28 +20,25 @@ public class NaverService {
     /**
      * 네이버 로그인 처리 흐름을 수행합니다.
      *
-     * @param code 네이버 인가 코드
+     * @param accessToken 네이버 인가 코드
      */
     @Transactional
-    public Mono<?> loginNaver(String code) {
-        return naverDomain.getNaverAccessToken(code)
-                .flatMap(token ->
-                        naverDomain.getNaverUser(token.access_token())
-                                .flatMap(naverUser ->
-                                        Mono.justOrEmpty(userRepository.findBySocialId(Long.parseLong(naverUser.response().id()), "NAVER"))
-                                                .map(user -> {
-                                                    String access = commonService.issueToken(user.getUserSeq(), "ACCESS", "Naver");
-                                                    String refresh = commonService.issueToken(user.getUserSeq(), "REFRESH", "Naver");
-                                                    commonService.saveToken(user.getUserSeq(), "WHITE", access);
-                                                    commonService.saveToken(user.getUserSeq(), "BLACK", refresh);
+    public Mono<?> loginNaver(String accessToken) {
+        return naverDomain.getNaverUser(accessToken)
+                .flatMap(naverUser ->
+                        Mono.justOrEmpty(userRepository.findBySocialId(naverUser.response().id(), "NAVER"))
+                                .map(user -> {
+                                    String access = commonService.issueToken(user.getUserSeq(), "ACCESS", "Naver");
+                                    String refresh = commonService.issueToken(user.getUserSeq(), "REFRESH", "Naver");
+                                    commonService.saveToken(user.getUserSeq(), "WHITE", access);
+                                    commonService.saveToken(user.getUserSeq(), "BLACK", refresh);
 
-                                                    return (Object) new LoginResponse(access, refresh);
-                                                })
-                                                .switchIfEmpty(
-                                                        Mono.fromSupplier(() ->
-                                                                (Object) new NoAccountResponse("NAVER", Long.parseLong(naverUser.response().id()))
-                                                        )
-                                                )
+                                    return (Object) new LoginResponse(access, refresh);
+                                })
+                                .switchIfEmpty(
+                                        Mono.fromSupplier(() ->
+                                                (Object) new NoAccountResponse("NAVER", naverUser.response().id())
+                                        )
                                 )
                 );
     }

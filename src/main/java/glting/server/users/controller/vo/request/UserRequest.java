@@ -3,7 +3,7 @@ package glting.server.users.controller.vo.request;
 public class UserRequest {
     public record NoAccountRequest(
             String type,
-            Long id,
+            String id,
             String name,
             String birth,
             String gender,

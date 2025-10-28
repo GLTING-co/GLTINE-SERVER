@@ -22,28 +22,25 @@ public class KakaoService {
     /**
      * 카카오 로그인 처리 흐름을 수행합니다.
      *
-     * @param code 카카오 인가 코드
+     * @param accessToken 카카오 인가 코드
      */
     @Transactional
-    public Mono<?> loginKakao(String code) {
-        return kakaoDomain.getKakaoAccessToken(code)
-                .flatMap(token ->
-                        kakaoDomain.getKakaoUser(token.access_token())
-                                .flatMap(kakaoUser ->
-                                        Mono.justOrEmpty(userRepository.findBySocialId(kakaoUser.id(), "KAKAO"))
-                                                .map(user -> {
-                                                    String access = commonService.issueToken(user.getUserSeq(), "ACCESS", "Kakao");
-                                                    String refresh = commonService.issueToken(user.getUserSeq(), "REFRESH", "Kakao");
-                                                    commonService.saveToken(user.getUserSeq(), "WHITE", access);
-                                                    commonService.saveToken(user.getUserSeq(), "BLACK", refresh);
+    public Mono<?> loginKakao(String accessToken) {
+        return kakaoDomain.getKakaoUser(accessToken)
+                .flatMap(kakaoUser ->
+                        Mono.justOrEmpty(userRepository.findBySocialId(kakaoUser.id(), "KAKAO"))
+                                .map(user -> {
+                                    String access = commonService.issueToken(user.getUserSeq(), "ACCESS", "Kakao");
+                                    String refresh = commonService.issueToken(user.getUserSeq(), "REFRESH", "Kakao");
+                                    commonService.saveToken(user.getUserSeq(), "WHITE", access);
+                                    commonService.saveToken(user.getUserSeq(), "BLACK", refresh);
 
-                                                    return (Object) new LoginResponse(access, refresh);
-                                                })
-                                                .switchIfEmpty(
-                                                        Mono.fromSupplier(() ->
-                                                                (Object) new NoAccountResponse("KAKAO", kakaoUser.id())
-                                                        )
-                                                )
+                                    return (Object) new LoginResponse(access, refresh);
+                                })
+                                .switchIfEmpty(
+                                        Mono.fromSupplier(() ->
+                                                (Object) new NoAccountResponse("KAKAO", kakaoUser.id())
+                                        )
                                 )
                 );
     }

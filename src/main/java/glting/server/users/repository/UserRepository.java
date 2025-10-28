@@ -30,7 +30,7 @@ public class UserRepository {
      * @param type     소셜 플랫폼 종류 (KAKAO, NAVER, GOOGLE)
      * @return 해당 소셜 계정에 연결된 사용자 엔티티
      */
-    public Optional<UserEntity> findBySocialId(Long socialId, String type) {
+    public Optional<UserEntity> findBySocialId(String socialId, String type) {
         QUserEntity userEntity = QUserEntity.userEntity;
 
         BooleanExpression condition = switch (type.toUpperCase()) {

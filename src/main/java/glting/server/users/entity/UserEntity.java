@@ -45,19 +45,19 @@ public class UserEntity extends BaseTimeEntity {
     private String relationship;
 
     @Column(name = "kakao_id", nullable = true, unique = true)
-    private Long kakaoId;
+    private String kakaoId;
 
     @Column(name = "naver_id", nullable = true, unique = true)
-    private Long naverId;
+    private String naverId;
 
     @Column(name = "google_id", nullable = true, unique = true)
-    private Long googleId;
+    private String googleId;
 
     @Builder.Default
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean deleted = false;
 
-    public void updateSocialId(String type, Long socialId) {
+    public void updateSocialId(String type, String socialId) {
         switch (type.toUpperCase()) {
             case "GOOGLE" -> this.googleId = socialId;
             case "NAVER" -> this.naverId = socialId;

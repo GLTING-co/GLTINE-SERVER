@@ -10,7 +10,7 @@ public class KakaoDto {
     }
 
     public record KakaoUserResponse(
-            Long id
+            String id
     ) {
     }
 }
