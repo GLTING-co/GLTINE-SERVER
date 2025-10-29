@@ -19,10 +19,6 @@ public class UserRepository {
         return userJpaRepository.save(userEntity);
     }
 
-    public void flush() {
-        userJpaRepository.flush();
-    }
-
     /**
      * 소셜 ID와 소셜 타입(KAKAO, NAVER, GOOGLE)에 따라 사용자를 조회합니다.
      *

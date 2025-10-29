@@ -17,7 +17,7 @@ import java.util.List;
 
 import static glting.server.exception.code.ExceptionCodeMapper.*;
 import static glting.server.exception.code.ExceptionCodeMapper.getCode;
-import static glting.server.users.controller.vo.request.UserRequest.*;
+import static glting.server.users.controller.request.UserRequest.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +55,6 @@ public class UserService {
                     .build();
             userEntity.updateSocialId(request.type().toUpperCase(), request.id());
             UserEntity savedUserEntity = userRepository.saveUserEntity(userEntity);
-            userRepository.flush();
 
             List<String> imageUrls = commonService.uploadJPGFileList(images);
             userImageRepository.saveAllUserImageUrls(savedUserEntity.getUserSeq(), imageUrls);
