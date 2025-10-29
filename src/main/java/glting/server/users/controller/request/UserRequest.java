@@ -1,4 +1,4 @@
-package glting.server.users.controller.vo.request;
+package glting.server.users.controller.request;
 
 public class UserRequest {
     public record NoAccountRequest(

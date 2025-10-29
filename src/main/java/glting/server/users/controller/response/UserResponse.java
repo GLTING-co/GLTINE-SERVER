@@ -1,4 +1,4 @@
-package glting.server.users.controller.vo.response;
+package glting.server.users.controller.response;
 
 public class UserResponse {
     public record LoginResponse(
