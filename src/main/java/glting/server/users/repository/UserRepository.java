@@ -2,13 +2,22 @@ package glting.server.users.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import glting.server.exception.NotFoundException;
+import glting.server.exception.code.ExceptionCodeMapper;
+import glting.server.recommendation.controller.vo.request.RecommendationFilterRequest;
+import glting.server.users.controller.vo.response.UserProfileResponse;
 import glting.server.users.entity.QUserEntity;
 import glting.server.users.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import static glting.server.exception.code.ExceptionCodeMapper.*;
+import static glting.server.exception.code.ExceptionCodeMapper.getCode;
 
 @Repository
 @RequiredArgsConstructor
@@ -54,9 +63,39 @@ public class UserRepository {
         return Optional.ofNullable(result);
     }
 
+    public List<UserEntity> findAll(Specification<UserEntity> specification) {
+
+
+
+        return userJpaRepository.findAll(specification);
+    }
+
+
+    public List<UserProfileResponse> findAll(RecommendationFilterRequest request, List<Long> swipedIds) {
+
+        return userMapper.findRecommendation(request, swipedIds);
+    }
 
     public List<UserEntity> testMyBatis() {
 
         return userMapper.findAll();
     }
+
+    public void saveAll(List<UserEntity> users) {
+        userJpaRepository.saveAll(users);
+    }
+
+    public long count(){
+        return userJpaRepository.count();
+    }
+
+
+    public UserEntity findByUserSeq(Long userSeq) {
+
+        return userJpaRepository.findByUserSeq(userSeq).orElseThrow(() -> new NotFoundException(
+                HttpStatus.NOT_FOUND.value(),
+                "존재하지 않은 회원입니다.",
+                getCode("존재하지 않은 회원입니다.", ExceptionType.SERVER)));
+    }
+
 }
