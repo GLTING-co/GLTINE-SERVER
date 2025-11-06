@@ -140,6 +140,11 @@ public class UserService {
         }
     }
 
+    public List<UserEntity> testMyBatis() {
+
+        return userRepository.testMyBatis();
+    }
+
     /**
      * 사용자 프로필 정보를 조회합니다.
      *

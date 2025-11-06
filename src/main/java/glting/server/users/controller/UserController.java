@@ -4,6 +4,7 @@ import glting.server.base.BaseResponse;
 import glting.server.exception.BadRequestException;
 import glting.server.exception.handler.GlobalExceptionHandler;
 import glting.server.social.kakao.service.KakaoService;
+import glting.server.users.entity.UserEntity;
 import glting.server.social.naver.service.NaverService;
 import glting.server.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -136,6 +137,16 @@ public class UserController {
     public Mono<BaseResponse<?>> loginNaver(@RequestBody SocialLoginRequest request) {
         return naverService.loginNaver(request.accessToken())
                 .map(response -> BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
+    }
+
+
+    @GetMapping("/myBatis")
+    @Operation(summary = "마이바티스 예제 API")
+    public ResponseEntity<BaseResponse<List<UserEntity>>> myBatis() {
+
+        List<UserEntity> entity = userService.testMyBatis();
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), entity));
     }
 
     @PostMapping("/logout")

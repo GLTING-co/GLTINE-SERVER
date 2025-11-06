@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="glting.server.users.repository.UserMapper">
+
+    <resultMap id="userMap" type="glting.server.users.entity.UserEntity">
+        <id property="userSeq" column="user_seq"/>
+        <result property="name" column="name"/>
+        <result property="birth" column="birth"/>
+        <result property="gender" column="gender"/>
+        <result property="sexualType" column="sexual_type"/>
+        <result property="relationship" column="relationship"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="userMap">
+        SELECT * FROM USER
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="userMap">
+        SELECT * FROM USER WHERE user_seq = #{userSeq}
+    </select>
+
+    <insert id="insertUser" parameterType="glting.server.users.entity.UserEntity" useGeneratedKeys="true" keyProperty="userSeq">
+        INSERT INTO USER (name, birth, gender, sexual_type, relationship)
+        VALUES (#{name}, #{birth}, #{gender}, #{sexualType}, #{relationship})
+    </insert>
+
+
+    <select id="findRecommendation" resultType="glting.server.users.controller.vo.response.UserProfileResponse">
+        SELECT
+        u.user_seq           AS userSeq,
+        u.name               AS name,
+        FLOOR(DATEDIFF(CURDATE(), u.birth)/365) AS age,
+        u.gender             AS gender,
+        u.sexual_type        AS sexualType,
+        u.relationship       AS relationship,
+        ui.image             AS image
+        FROM
+        user u
+        LEFT JOIN
+        user_image ui ON u.user_seq = ui.user_seq
+        AND ui.deleted = FALSE
+        WHERE
+        u.deleted = FALSE
+        AND u.user_seq != #{filter.user}
+        AND u.gender != (SELECT gender FROM user WHERE user_seq = #{filter.user})
+        <if test="filter.sexualType != null">
+            AND u.sexual_type = #{filter.sexualType}
+        </if>
+        <if test="filter.relationship != null">
+            AND u.relationship = #{filter.relationship}
+        </if>
+        <if test="filter.minAge != null">
+            AND CAST(FLOOR(DATEDIFF(CURDATE(), u.birth)/365) AS UNSIGNED) >= #{filter.minAge}
+        </if>
+        <if test="filter.maxAge != null">
+            AND CAST(FLOOR(DATEDIFF(CURDATE(), u.birth)/365) AS UNSIGNED) <![CDATA[<=]]> #{filter.maxAge}
+        </if>
+        <if test="swipedIds != null and swipedIds.size > 0">
+            AND u.user_seq NOT IN
+            <foreach collection="swipedIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>
