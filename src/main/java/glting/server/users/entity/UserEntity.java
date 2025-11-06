@@ -52,6 +52,9 @@ public class UserEntity extends BaseTimeEntity {
     @Column(name = "height", nullable = true, unique = false)
     private Integer height;
 
+    @Column(name = "weight", nullable = true, unique = false)
+    private Integer weight;
+
     @Column(name = "job_title", nullable = true, unique = false)
     private String job;
 
@@ -128,10 +131,11 @@ public class UserEntity extends BaseTimeEntity {
      * @param drinking 음주 여부 (NONE, OCCASIONAL, REGULAR)
      * @param religion 종교 (NONE, CHRISTIAN, CATHOLIC, BUDDHIST, ISLAM, HINDU, OTHER)
      */
-    public void updateUser(String bio, Integer height, String job, String company, String school,
+    public void updateUser(String bio, Integer height, Integer weight, String job, String company, String school,
                            String city, String smoking, String drinking, String religion, Boolean open) {
         this.bio = bio;
         this.height = height;
+        this.weight = weight;
         this.job = job;
         this.company = company;
         this.school = school;
