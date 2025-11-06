@@ -32,6 +32,12 @@ public class ExceptionCodeMapper {
 
         // UnauthorizedException
         UNAUTHORIZED_MAP.put("", "UNAUTHORIZED_EXCEPTION_001");
+        UNAUTHORIZED_MAP.put("만료된 JWT 입니다.", "UNAUTHORIZED_EXCEPTION_002");
+        UNAUTHORIZED_MAP.put("잘못된 JWT 입니다.", "UNAUTHORIZED_EXCEPTION_003");
+        UNAUTHORIZED_MAP.put("ACCESS 토큰만 사용할 수 있습니다.", "UNAUTHORIZED_EXCEPTION_004");
+        UNAUTHORIZED_MAP.put("로그아웃된 토큰입니다.", "UNAUTHORIZED_EXCEPTION_005");
+        UNAUTHORIZED_MAP.put("유효하지 않은 토큰입니다.", "UNAUTHORIZED_EXCEPTION_006");
+        UNAUTHORIZED_MAP.put("JWT 토큰 처리 중 오류가 발생했습니다.", "UNAUTHORIZED_EXCEPTION_007");
     }
 
     public static String getCode(String message, ExceptionType type) {
