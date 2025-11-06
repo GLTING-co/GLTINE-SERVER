@@ -17,6 +17,19 @@ public interface UserImageJpaRepository extends JpaRepository<UserImageEntity, I
      * @param userSeq 사용자 고유 식별자(PK)
      */
     @Modifying
-    @Query("UPDATE UserImageEntity ui SET ui.deleted = true WHERE ui.userSeq = :userSeq AND ui.deleted = false")
+    @Query("""
+            UPDATE UserImageEntity ui
+            SET ui.deleted = true
+            WHERE ui.userEntity.userSeq = :userSeq AND ui.deleted = false
+            """)
     void deleteAllByUserSeq(@Param("userSeq") Long userSeq);
+
+    @Query("""
+            SELECT ui
+            FROM UserImageEntity ui
+            WHERE ui.userEntity.userSeq = :userSeq AND ui.deleted = false
+            ORDER BY ui.userImageSeq DESC
+            LIMIT 1
+            """)
+    UserImageEntity findRepresentImageByUserSeq(@Param("userSeq") Long userSeq);
 }
