@@ -96,7 +96,7 @@ public class UserService {
      *
      * @param userSeq 사용자 고유 식별자(PK)
      * @param request 업데이트할 사용자 정보 (bio, height, job, company, school, city, smoking, drinking, religion, open)
-     * @param images 새로운 프로필 이미지 파일 목록
+     * @param images  새로운 프로필 이미지 파일 목록
      */
     @Transactional
     public void update(Long userSeq, UpdateUserRequest request, List<MultipartFile> images) {
@@ -115,6 +115,7 @@ public class UserService {
             userEntity.updateUser(
                     request.bio(),
                     request.height(),
+                    request.weight(),
                     request.job(),
                     request.company(),
                     request.school(),
@@ -138,11 +139,6 @@ public class UserService {
                     getCode(e.getMessage(), ExceptionType.SERVER)
             );
         }
-    }
-
-    public List<UserEntity> testMyBatis() {
-
-        return userRepository.testMyBatis();
     }
 
     /**
@@ -208,7 +204,7 @@ public class UserService {
                         getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
                 ));
 
-        if (!commonService.isTokenInWhiteList(userSeq, request.refreshToken())) {
+        if (commonService.isTokenInWhiteList(userSeq, request.refreshToken())) {
             throw new UnauthorizedException(
                     HttpStatus.UNAUTHORIZED.value(),
                     "유효하지 않은 Refresh Token입니다.",

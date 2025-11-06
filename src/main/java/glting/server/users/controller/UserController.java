@@ -139,16 +139,6 @@ public class UserController {
                 .map(response -> BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 
-
-    @GetMapping("/myBatis")
-    @Operation(summary = "마이바티스 예제 API")
-    public ResponseEntity<BaseResponse<List<UserEntity>>> myBatis() {
-
-        List<UserEntity> entity = userService.testMyBatis();
-
-        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), entity));
-    }
-
     @PostMapping("/logout")
     @Operation(summary = "로그아웃 API")
     @ApiResponses(value = {

@@ -1,6 +1,7 @@
 package glting.server.users;
 
 import glting.server.users.entity.UserEntity;
+import glting.server.users.repository.UserJpaRepository;
 import glting.server.users.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserTestDataLoader {
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @PostConstruct
     public void init() {
-        if (userRepository.count() > 0) return; // 이미 있으면 생략
+        if (userJpaRepository.count() > 0) return; // 이미 있으면 생략
 
         List<UserEntity> users = new ArrayList<>();
 
@@ -123,6 +124,6 @@ public class UserTestDataLoader {
         users.add(UserEntity.builder().name("최유나").birth("1997-03-09").gender("FEMALE").sexualType("LESBIAN").relationship("SINGLE").kakaoId("200000049L").deleted(false).build());
         users.add(UserEntity.builder().name("정민서").birth("1996-09-27").gender("FEMALE").sexualType("LESBIAN").relationship("SINGLE").kakaoId("200000050L").deleted(false).build());
 
-        userRepository.saveAll(users);
+        userJpaRepository.saveAll(users);
     }
 }

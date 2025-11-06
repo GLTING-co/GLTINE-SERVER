@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -40,9 +41,8 @@ public class ChatController {
     })
     public ResponseEntity<BaseResponse<List<GetChatRoomListResponse>>> chatRoomList(HttpServletRequest httpServletRequest) {
         Long hostSeq = (Long) httpServletRequest.getAttribute("userSeq");
-        List<GetChatRoomListResponse> response = chatService.chatRoomList(hostSeq);
-
-        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
+        return ResponseEntity.ok()
+                .body(BaseResponse.ofSuccess(HttpStatus.OK.value(), chatService.chatRoomList(hostSeq)));
     }
 
     @GetMapping("/chat-room")
@@ -52,14 +52,16 @@ public class ChatController {
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않는 채팅방입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<BaseResponse<List<GetChatRoomResponse>>> chatRoom(
+    public ResponseEntity<BaseResponse<GetChatRoomResponse>> chatRoom(
             @RequestParam(value = "chatRoomSeq") String chatRoomSeq,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size,
             HttpServletRequest httpServletRequest
     ) {
         Long hostSeq = (Long) httpServletRequest.getAttribute("userSeq");
-        List<GetChatRoomResponse> response = chatService.chatRoom(hostSeq, chatRoomSeq);
-
-        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
+        return ResponseEntity.ok()
+                .body(BaseResponse.ofSuccess(HttpStatus.OK.value(),
+                        chatService.chatRoom(hostSeq, chatRoomSeq, PageRequest.of(page, size))));
     }
 
     @MessageMapping("/chat/message")

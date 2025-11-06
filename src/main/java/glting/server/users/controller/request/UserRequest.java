@@ -25,6 +25,7 @@ public class UserRequest {
     public record UpdateUserRequest(
             String bio,
             Integer height,
+            Integer weight,
             String job,
             String company,
             String school,

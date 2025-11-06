@@ -2,6 +2,8 @@ package glting.server.chat.repository;
 
 import glting.server.chat.entity.ChatMessageEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,6 +21,17 @@ public class ChatMessageRepository {
      */
     public List<ChatMessageEntity> findAllByChatRoomSeq(String chatRoomSeq) {
         return chatMessageJpaRepository.findAllByChatRoomSeq(chatRoomSeq);
+    }
+
+    /**
+     * 채팅방 고유 식별자로 채팅 메시지 목록을 페이징하여 조회합니다.
+     *
+     * @param chatRoomSeq 채팅방 고유 식별자(PK)
+     * @param pageable    페이징 정보
+     * @return 채팅 메시지 엔티티 페이지
+     */
+    public Page<ChatMessageEntity> findAllByChatRoomSeq(String chatRoomSeq, Pageable pageable) {
+        return chatMessageJpaRepository.findAllByChatRoomSeq(chatRoomSeq, pageable);
     }
 
     /**
