@@ -1,5 +1,6 @@
 package glting.server.users.repository;
 
+import glting.server.users.entity.UserImageEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -33,5 +34,9 @@ public class UserImageRepository {
                     ps.setString(2, url);
                 }
         );
+    }
+
+    public void deleteAllByUserSeq(Long userSeq) {
+        userImageJpaRepository.deleteAllByUserSeq(userSeq);
     }
 }
