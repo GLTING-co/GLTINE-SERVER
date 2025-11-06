@@ -32,13 +32,15 @@ public class ExceptionCodeMapper {
         SERVER_MAP.put("네이버 로그아웃 호출 중 오류가 발생했습니다.", "SERVER_EXCEPTION_006");
 
         // UnauthorizedException
-        UNAUTHORIZED_MAP.put("", "UNAUTHORIZED_EXCEPTION_001");
         UNAUTHORIZED_MAP.put("만료된 JWT 입니다.", "UNAUTHORIZED_EXCEPTION_002");
         UNAUTHORIZED_MAP.put("잘못된 JWT 입니다.", "UNAUTHORIZED_EXCEPTION_003");
         UNAUTHORIZED_MAP.put("ACCESS 토큰만 사용할 수 있습니다.", "UNAUTHORIZED_EXCEPTION_004");
-        UNAUTHORIZED_MAP.put("로그아웃된 토큰입니다.", "UNAUTHORIZED_EXCEPTION_005");
-        UNAUTHORIZED_MAP.put("유효하지 않은 토큰입니다.", "UNAUTHORIZED_EXCEPTION_006");
-        UNAUTHORIZED_MAP.put("JWT 토큰 처리 중 오류가 발생했습니다.", "UNAUTHORIZED_EXCEPTION_007");
+        UNAUTHORIZED_MAP.put("REFRESH 토큰만 사용할 수 있습니다.", "UNAUTHORIZED_EXCEPTION_005");
+        UNAUTHORIZED_MAP.put("로그아웃된 토큰입니다.", "UNAUTHORIZED_EXCEPTION_006");
+        UNAUTHORIZED_MAP.put("이미 사용된 Refresh Token입니다.", "UNAUTHORIZED_EXCEPTION_007");
+        UNAUTHORIZED_MAP.put("유효하지 않은 토큰입니다.", "UNAUTHORIZED_EXCEPTION_008");
+        UNAUTHORIZED_MAP.put("유효하지 않은 Refresh Token입니다.", "UNAUTHORIZED_EXCEPTION_008");
+        UNAUTHORIZED_MAP.put("JWT 토큰 처리 중 오류가 발생했습니다.", "UNAUTHORIZED_EXCEPTION_009");
     }
 
     public static String getCode(String message, ExceptionType type) {
