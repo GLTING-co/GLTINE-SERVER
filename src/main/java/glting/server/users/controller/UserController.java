@@ -36,7 +36,7 @@ public class UserController {
     private final KakaoService kakaoService;
     private final NaverService naverService;
 
-    @GetMapping("/A")
+    @GetMapping()
     @Operation(
             operationId = "1",
             summary = "소셜 로그인/회원가입 API Description - 필독!",
@@ -70,7 +70,6 @@ public class UserController {
     }
 
     @PostMapping(
-            value = "/register",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -109,7 +108,7 @@ public class UserController {
             );
         }
 
-        userService.registerUser(request, images);
+        userService.register(request, images);
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
     }
 
@@ -141,14 +140,49 @@ public class UserController {
     @Operation(summary = "로그아웃 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "SERVER_EXCEPTION_004", description = "네이버 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "SERVER_EXCEPTION_005", description = "네이버 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<String>> logout(HttpServletRequest httpServletRequest, @RequestBody LogoutUserRequest request) {
         Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
         String accessToken = (String) httpServletRequest.getAttribute("accessToken");
 
         userService.logout(userSeq, accessToken, request.refreshToken());
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
+    }
+
+    @PutMapping(
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(summary = "회원 정보 수정 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "BAD_REQUEST_EXCEPTION_001", description = "요청 데이터 오류입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public ResponseEntity<BaseResponse<String>> update(
+            HttpServletRequest httpServletRequest,
+            @RequestPart(value = "request", required = false) UpdateUserRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) {
+        if (request == null) {
+            throw new BadRequestException(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "요청 데이터 오류입니다.",
+                    getCode("요청 데이터 오류입니다.", ExceptionType.BAD_REQUEST)
+            );
+        }
+
+        if (images.isEmpty()) {
+            throw new BadRequestException(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "요청 데이터 오류입니다.",
+                    getCode("요청 데이터 오류입니다.", ExceptionType.BAD_REQUEST)
+            );
+        }
+
+        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
+        userService.update(userSeq, request, images);
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
     }
