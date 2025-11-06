@@ -16,7 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static glting.server.common.util.CommonUtil.*;
@@ -172,6 +177,12 @@ public class CommonService {
                 .getBody();
     }
 
+    /**
+     * 단일 이미지 파일을 S3에 업로드합니다.
+     *
+     * @param multipartFile 업로드할 이미지 파일
+     * @return S3에 업로드된 파일의 URL
+     */
     public String uploadJPGFile(MultipartFile multipartFile) {
         try {
             String fileName = randomUUID().toString() + ".jpg";
@@ -192,6 +203,12 @@ public class CommonService {
         }
     }
 
+    /**
+     * 여러 이미지 파일을 S3에 일괄 업로드합니다.
+     *
+     * @param multipartFiles 업로드할 이미지 파일 목록
+     * @return S3에 업로드된 파일들의 URL 목록
+     */
     public List<String> uploadJPGFileList(List<MultipartFile> multipartFiles) {
         try {
             String fileName = randomUUID().toString() + ".jpg";
