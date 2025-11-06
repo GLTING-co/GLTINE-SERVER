@@ -1,14 +1,12 @@
 package glting.server.config;
 
 import glting.server.common.service.CommonService;
-import glting.server.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -17,9 +15,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
-
-import static glting.server.exception.code.ExceptionCodeMapper.*;
-import static glting.server.exception.code.ExceptionCodeMapper.getCode;
 
 @Component
 @RequiredArgsConstructor
@@ -45,11 +40,8 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             String authHeader = httpRequest.getHeader("Authorization");
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new UnauthorizedException(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        "유효하지 않은 토큰입니다.",
-                        getCode("유효하지 않은 토큰입니다.", ExceptionType.UNAUTHORIZED)
-                );
+                response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                return false;
             }
 
             String token = authHeader.substring(7);
@@ -60,27 +52,18 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
                 Long userSeq = ((Number) claims.get("userSeq")).longValue();
 
                 if (!"ACCESS".equalsIgnoreCase(type)) {
-                    throw new UnauthorizedException(
-                            HttpStatus.UNAUTHORIZED.value(),
-                            "ACCESS 토큰만 사용할 수 있습니다.",
-                            getCode("ACCESS 토큰만 사용할 수 있습니다.", ExceptionType.UNAUTHORIZED)
-                    );
+                    response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                    return false;
                 }
 
                 if (commonService.isTokenInBlackList(userSeq, token)) {
-                    throw new UnauthorizedException(
-                            HttpStatus.UNAUTHORIZED.value(),
-                            "로그아웃된 토큰입니다.",
-                            getCode("로그아웃된 토큰입니다.", ExceptionType.UNAUTHORIZED)
-                    );
+                    response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                    return false;
                 }
 
                 if (!commonService.isTokenInWhiteList(userSeq, token)) {
-                    throw new UnauthorizedException(
-                            HttpStatus.UNAUTHORIZED.value(),
-                            "유효하지 않은 토큰입니다.",
-                            getCode("유효하지 않은 토큰입니다.", ExceptionType.UNAUTHORIZED)
-                    );
+                    response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                    return false;
                 }
 
                 attributes.put("accessToken", token);
@@ -89,40 +72,14 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 
                 return true;
 
-            } catch (ExpiredJwtException e) {
-                throw new UnauthorizedException(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        "만료된 JWT 입니다.",
-                        getCode("만료된 JWT 입니다.", ExceptionType.UNAUTHORIZED)
-                );
-            } catch (SignatureException e) {
-                throw new UnauthorizedException(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        "잘못된 JWT 입니다.",
-                        getCode("잘못된 JWT 입니다.", ExceptionType.UNAUTHORIZED)
-                );
-            } catch (JwtException e) {
-                throw new UnauthorizedException(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        "JWT 토큰 처리 중 오류가 발생했습니다.",
-                        getCode("JWT 토큰 처리 중 오류가 발생했습니다.", ExceptionType.UNAUTHORIZED)
-                );
-            } catch (UnauthorizedException e) {
-                throw e;
             } catch (Exception e) {
-                throw new UnauthorizedException(
-                        HttpStatus.UNAUTHORIZED.value(),
-                        e.getMessage(),
-                        getCode(e.getMessage(), ExceptionType.UNAUTHORIZED)
-                );
+                response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                return false;
             }
         }
 
-        throw new UnauthorizedException(
-                HttpStatus.UNAUTHORIZED.value(),
-                "유효하지 않은 토큰입니다.",
-                getCode("유효하지 않은 토큰입니다.", ExceptionType.UNAUTHORIZED)
-        );
+        response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        return false;
     }
 
     @Override
