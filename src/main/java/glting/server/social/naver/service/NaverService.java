@@ -31,7 +31,7 @@ public class NaverService {
                                     String access = commonService.issueToken(user.getUserSeq(), "ACCESS", "Naver");
                                     String refresh = commonService.issueToken(user.getUserSeq(), "REFRESH", "Naver");
                                     commonService.saveToken(user.getUserSeq(), "WHITE", access);
-                                    commonService.saveToken(user.getUserSeq(), "BLACK", refresh);
+                                    commonService.saveToken(user.getUserSeq(), "WHITE", refresh);
 
                                     return (Object) new LoginResponse(access, refresh);
                                 })
