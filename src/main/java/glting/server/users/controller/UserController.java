@@ -26,6 +26,7 @@ import java.util.List;
 import static glting.server.exception.code.ExceptionCodeMapper.*;
 import static glting.server.exception.code.ExceptionCodeMapper.getCode;
 import static glting.server.users.controller.request.UserRequest.*;
+import static glting.server.users.controller.response.UserResponse.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class UserController {
     private final KakaoService kakaoService;
     private final NaverService naverService;
 
-    @GetMapping()
+    @GetMapping("/DESCRPTION")
     @Operation(
             operationId = "1",
             summary = "소셜 로그인/회원가입 API Description - 필독!",
@@ -79,6 +80,7 @@ public class UserController {
             @ApiResponse(responseCode = "BAD_REQUEST_EXCEPTION_001", description = "요청 데이터 오류입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "BAD_REQUEST_EXCEPTION_002", description = "이미 회원가입된 사용자입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "CONFLICT_EXCEPTION_002", description = "동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "SERVER_EXCEPTION_예외코드 설정하세요.", description = "서버 내부 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<String>> register(
             @RequestPart(value = "request", required = false) NoAccountRequest request,
@@ -140,6 +142,7 @@ public class UserController {
     @Operation(summary = "로그아웃 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "SERVER_EXCEPTION_예외코드 설정하세요.", description = "서버 내부 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<String>> logout(HttpServletRequest httpServletRequest, @RequestBody LogoutUserRequest request) {
         Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
@@ -176,6 +179,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "BAD_REQUEST_EXCEPTION_001", description = "요청 데이터 오류입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "CONFLICT_EXCEPTION_003", description = "다른 요청이 먼저 수정했습니다. 다시 시도해주세요.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<String>> update(
             HttpServletRequest httpServletRequest,
@@ -200,6 +204,32 @@ public class UserController {
 
         Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
         userService.update(userSeq, request, images);
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
+    }
+
+    @GetMapping()
+    @Operation(summary = "회원 정보 개별 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public ResponseEntity<BaseResponse<GetUserResponse>> get(HttpServletRequest request) {
+        Long userSeq = (Long) request.getAttribute("userSeq");
+        GetUserResponse response = userService.get(userSeq);
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
+    }
+
+    @DeleteMapping
+    @Operation(summary = "회원 삭제 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public ResponseEntity<BaseResponse<String>> delete(HttpServletRequest request) {
+        Long userSeq = (Long) request.getAttribute("userSeq");
+        userService.delete(userSeq);
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
     }
