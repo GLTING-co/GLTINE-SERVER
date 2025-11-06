@@ -31,7 +31,7 @@ import static glting.server.users.controller.response.UserResponse.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user-service")
-@Tag(name = "소셜", description = "담당자(박종훈)")
+@Tag(name = "회원", description = "담당자(박종훈)")
 public class UserController {
     private final UserService userService;
     private final KakaoService kakaoService;
@@ -173,6 +173,8 @@ public class UserController {
                       * 허용 값: NONE (음주 안함), OCCASIONAL (가끔), REGULAR (자주)
                     - religion: 종교
                       * 허용 값: NONE (무교), CHRISTIAN (기독교), CATHOLIC (천주교), BUDDHIST (불교), ISLAM (이슬람), HINDU (힌두교), OTHER (기타)
+                    - open: 프로필 공개 여부
+                      * 공개면 true, 비공개면 false -> 비공개 시 초기 프로필 화면 모자이크 처리
                     """
     )
     @ApiResponses(value = {

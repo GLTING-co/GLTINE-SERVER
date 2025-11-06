@@ -14,11 +14,25 @@ public class ExceptionLogEntityRepositoryImpl implements ExceptionLogEntityRepos
     private final ExceptionLogEntityJpaRepository repository;
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 예외 로그 엔티티를 저장합니다.
+     *
+     * @param exceptionLogEntity 저장할 예외 로그 엔티티
+     * @return 저장된 예외 로그 엔티티
+     */
     @Override
     public ExceptionLogEntity saveExceptionLogEntity(ExceptionLogEntity exceptionLogEntity) {
         return repository.save(exceptionLogEntity);
     }
 
+    /**
+     * 예외 로그 목록을 페이징하여 조회합니다.
+     * QueryDSL을 사용하여 생성일시 내림차순으로 정렬합니다.
+     *
+     * @param start 시작 인덱스 (0부터 시작)
+     * @param end 종료 인덱스 (포함하지 않음)
+     * @return 예외 로그 엔티티 목록 (생성일시 내림차순 정렬)
+     */
     @Override
     public List<ExceptionLogEntity> findAll(int start, int end) {
         QExceptionLogEntity qExceptionLogEntity = QExceptionLogEntity.exceptionLogEntity;

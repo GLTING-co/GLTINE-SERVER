@@ -22,7 +22,9 @@ public class KakaoService {
     /**
      * 카카오 로그인 처리 흐름을 수행합니다.
      *
-     * @param accessToken 카카오 인가 코드
+     * @param accessToken 카카오 Access Token
+     * @return 로그인된 사용자의 경우 LoginResponse (accessToken, refreshToken),
+     *         미가입 사용자의 경우 NoAccountResponse (소셜 타입, 소셜 ID)
      */
     @Transactional
     public Mono<?> loginKakao(String accessToken) {

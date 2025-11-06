@@ -1,5 +1,6 @@
 package glting.server.users.repository;
 
+import glting.server.users.entity.UserImageEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -35,7 +36,23 @@ public class UserImageRepository {
         );
     }
 
+    /**
+     * 사용자 고유 식별자에 해당하는 모든 사용자 이미지를 삭제합니다. (Soft Delete)
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     */
     public void deleteAllByUserSeq(Long userSeq) {
         userImageJpaRepository.deleteAllByUserSeq(userSeq);
+    }
+
+    /**
+     * 사용자 고유 식별자로 대표 이미지를 조회합니다.
+     * userImageSeq가 가장 작은 이미지를 대표 이미지로 반환합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @return 대표 이미지 엔티티 (존재하지 않으면 null)
+     */
+    public UserImageEntity findRepresentImageByUserSeq(Long userSeq) {
+        return userImageJpaRepository.findRepresentImageByUserSeq(userSeq);
     }
 }

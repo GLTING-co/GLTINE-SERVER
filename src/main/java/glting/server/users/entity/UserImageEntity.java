@@ -24,8 +24,9 @@ public class UserImageEntity extends BaseTimeEntity {
     @Column(name = "user_image_seq")
     private Long userImageSeq;
 
-    @Column(name = "user_seq", nullable = false)
-    private Long userSeq;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_seq", nullable = false)
+    private UserEntity userEntity;
 
     @Column(name = "image", nullable = false)
     private String image;
