@@ -16,4 +16,9 @@ public class UserRequest {
             String relationship
     ) {
     }
+
+    public record LogoutUserRequest(
+            String refreshToken
+    ) {
+    }
 }
