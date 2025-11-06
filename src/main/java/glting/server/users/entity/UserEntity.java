@@ -84,6 +84,11 @@ public class UserEntity extends BaseTimeEntity {
     @Column(name = "google_id", nullable = true, unique = true)
     private String googleId;
 
+    // ==== 프로필 공개 여뷰 ====
+    @Builder.Default
+    @Column(name = "open", nullable = false, unique = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean open = false;
+
     // ==== TODO 추후 유료화 예정 ====
     @Column(name = "plan", nullable = true, unique = false)
     private String plan; // 예: NONE, ----
@@ -123,8 +128,8 @@ public class UserEntity extends BaseTimeEntity {
      * @param drinking 음주 여부 (NONE, OCCASIONAL, REGULAR)
      * @param religion 종교 (NONE, CHRISTIAN, CATHOLIC, BUDDHIST, ISLAM, HINDU, OTHER)
      */
-    public void updateUser(String bio, Integer height, String job, String company,
-                           String school, String city, String smoking, String drinking, String religion) {
+    public void updateUser(String bio, Integer height, String job, String company, String school,
+                           String city, String smoking, String drinking, String religion, Boolean open) {
         this.bio = bio;
         this.height = height;
         this.job = job;
@@ -134,5 +139,6 @@ public class UserEntity extends BaseTimeEntity {
         this.smoking = smoking;
         this.drinking = drinking;
         this.religion = religion;
+        this.open = open;
     }
 }
