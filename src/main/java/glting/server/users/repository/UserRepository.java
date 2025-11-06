@@ -15,6 +15,12 @@ public class UserRepository {
     private final UserJpaRepository userJpaRepository;
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 사용자 엔티티를 저장합니다.
+     *
+     * @param userEntity 저장할 사용자 엔티티
+     * @return 저장된 사용자 엔티티
+     */
     public UserEntity saveUserEntity(UserEntity userEntity) {
         return userJpaRepository.save(userEntity);
     }
@@ -48,11 +54,13 @@ public class UserRepository {
         return Optional.ofNullable(result);
     }
 
+    /**
+     * 사용자 고유 식별자로 사용자를 조회합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @return 사용자 엔티티 (존재하지 않으면 Optional.empty())
+     */
     public Optional<UserEntity> findByUserSeq(Long userSeq) {
         return userJpaRepository.findById(userSeq);
-    }
-
-    public void deleteUserEntity(UserEntity userEntity) {
-        userJpaRepository.delete(userEntity);
     }
 }
