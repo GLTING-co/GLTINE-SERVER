@@ -1,7 +1,8 @@
 package glting.server.chat.controller.response;
 
+import org.springframework.data.domain.Page;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class ChatResponse {
     public record GetChatRoomListResponse(
@@ -18,7 +19,7 @@ public class ChatResponse {
             String guestName,
             String guestImage,
             Boolean open,
-            List<Message> messages
+            Page<Message> messages
     ) {
         public record Message(
                 String message,
