@@ -149,6 +149,17 @@ public class CommonService {
     }
 
     /**
+     * BLACK 리스트에서 토큰을 가져옵니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @return BLACK 리스트에 저장된 토큰, 없으면 null
+     */
+    public String getTokenFromBlackList(Long userSeq) {
+        String key = String.format(BLACK_KEY_FMT, userSeq);
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    /**
      * JWT 토큰에서 Claims를 추출합니다.
      *
      * @param token JWT 토큰 문자열

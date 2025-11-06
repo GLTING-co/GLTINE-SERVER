@@ -62,10 +62,10 @@ public class UserController {
                     회원가입이 되어 있지 않은 경우, 어플 회원 정보 (이름, 성별 .. etc)를 입력 받은 후 해당 정보들과 함께 type(Google, Kakao, Naver), id 데이터를 함께 보내주어야합니다.
                     """
     )
-    public ResponseEntity<BaseResponse<String>> description(HttpServletRequest request) {
-        Long userSeq = (Long) request.getAttribute("userSeq");
-        String type = (String) request.getAttribute("type");
-        String accessToken = (String) request.getAttribute("accessToken");
+    public ResponseEntity<BaseResponse<String>> description(HttpServletRequest httpServletRequest) {
+        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
+        String type = (String) httpServletRequest.getAttribute("type");
+        String accessToken = (String) httpServletRequest.getAttribute("accessToken");
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), userSeq + type + accessToken));
     }
@@ -214,8 +214,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<BaseResponse<GetUserResponse>> get(HttpServletRequest request) {
-        Long userSeq = (Long) request.getAttribute("userSeq");
+    public ResponseEntity<BaseResponse<GetUserResponse>> get(HttpServletRequest httpServletRequest) {
+        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
         GetUserResponse response = userService.get(userSeq);
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
@@ -227,10 +227,25 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<BaseResponse<String>> delete(HttpServletRequest request) {
-        Long userSeq = (Long) request.getAttribute("userSeq");
+    public ResponseEntity<BaseResponse<String>> delete(HttpServletRequest httpServletRequest) {
+        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
         userService.delete(userSeq);
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
+    }
+
+    @PostMapping("/reissue-token")
+    @Operation(summary = "토큰 재발급 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "UNAUTHORIZED_EXCEPTION_005", description = "REFRESH 토큰만 사용할 수 있습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "UNAUTHORIZED_EXCEPTION_007", description = "이미 사용된 Refresh Token입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "UNAUTHORIZED_EXCEPTION_008", description = "유효하지 않은 Refresh Token입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public ResponseEntity<BaseResponse<ReIssueTokenResponse>> reissueToken(@RequestBody ReIssueTokenRequest request) {
+        ReIssueTokenResponse response = userService.reissueToken(request);
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 }

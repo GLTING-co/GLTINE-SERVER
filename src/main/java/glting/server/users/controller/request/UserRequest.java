@@ -34,4 +34,9 @@ public class UserRequest {
             String religion
     ) {
     }
+
+    public record ReIssueTokenRequest(
+            String refreshToken
+    ) {
+    }
 }
