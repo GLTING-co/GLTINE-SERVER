@@ -1,17 +1,14 @@
 package glting.server.recommendation.service;
 
-import glting.server.recommendation.controller.vo.request.RecommendationFilterRequest;
 import glting.server.swipe.repository.SwipeRepository;
-import glting.server.users.controller.vo.response.UserProfileResponse;
-import glting.server.users.entity.UserEntity;
 import glting.server.users.repository.UserRepository;
-import glting.server.users.spec.UserSpecification;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
+import static glting.server.recommendation.controller.request.RecommendationRequest.*;
+import static glting.server.recommendation.controller.response.RecommendationResponse.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +24,7 @@ public class RecommendationService {
         List<Long> swipedIds = swipeRepository.findSwipedUserIds(filter.user());
 
 
-        return userRepository.findAll(filter,swipedIds);
+        return userRepository.findAll(filter, swipedIds);
 
     }
 }

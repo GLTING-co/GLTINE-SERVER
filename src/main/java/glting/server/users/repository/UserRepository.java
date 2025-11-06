@@ -2,8 +2,7 @@ package glting.server.users.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import glting.server.recommendation.controller.vo.request.RecommendationFilterRequest;
-import glting.server.users.controller.vo.response.UserProfileResponse;
+import glting.server.recommendation.controller.response.RecommendationResponse;
 import glting.server.users.entity.QUserEntity;
 import glting.server.users.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import static glting.server.recommendation.controller.request.RecommendationRequest.*;
+import static glting.server.recommendation.controller.response.RecommendationResponse.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -59,7 +61,6 @@ public class UserRepository {
     }
 
     public List<UserProfileResponse> findAll(RecommendationFilterRequest request, List<Long> swipedIds) {
-
         return userMapper.findRecommendation(request, swipedIds);
     }
 
