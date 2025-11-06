@@ -92,6 +92,11 @@ public class UserEntity extends BaseTimeEntity {
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean deleted = false;
 
+    @Version
+    @Builder.Default
+    @Column(name = "version", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer version = 0;
+
     public void updateSocialId(String type, String socialId) {
         switch (type.toUpperCase()) {
             case "GOOGLE" -> this.googleId = socialId;
