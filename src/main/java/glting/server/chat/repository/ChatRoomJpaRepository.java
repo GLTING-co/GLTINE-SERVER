@@ -15,8 +15,18 @@ public interface ChatRoomJpaRepository extends JpaRepository<ChatRoomEntity, Str
             FROM ChatRoomEntity cr
             JOIN FETCH cr.guestEntity g
             JOIN FETCH cr.hostEntity h
-            WHERE cr.hostEntity.userSeq = :hostSeq
+            WHERE cr.hostEntity.userSeq = :hostSeq AND cr.deleted = false
             ORDER BY cr.createdAt DESC
             """)
     List<ChatRoomEntity> findAllByHostSeq(@Param("hostSeq") Long hostSeq);
+
+    @Query("""
+            SELECT cr
+            FROM ChatRoomEntity cr
+            JOIN FETCH cr.guestEntity g
+            JOIN FETCH cr.hostEntity h
+            WHERE cr.chatRoomSeq = :chatRoomSeq AND cr.deleted = false
+            ORDER BY cr.createdAt DESC
+            """)
+    ChatRoomEntity findByChatRoomSeq(@Param("chatRoomSeq") String chatRoomSeq);
 }

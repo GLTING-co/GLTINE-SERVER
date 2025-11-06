@@ -14,6 +14,7 @@ public class ExceptionCodeMapper {
         // BadRequestException
         BAD_REQUEST_MAP.put("요청 데이터 오류입니다.", "BAD_REQUEST_EXCEPTION_001");
         BAD_REQUEST_MAP.put("이미 회원가입된 사용자입니다.", "BAD_REQUEST_EXCEPTION_002");
+        BAD_REQUEST_MAP.put("type 종류가 잘못됐습니다.", "BAD_REQUEST_EXCEPTION_003");
 
         // ConflictException
         CONFLICT_MAP.put("이미 회원가입된 사용자입니다.", "CONFLICT_EXCEPTION_001");
@@ -22,6 +23,7 @@ public class ExceptionCodeMapper {
 
         // NotFoundException
         NOT_FOUND_MAP.put("존재하지 않는 회원입니다.", "NOT_FOUND_EXCEPTION_001");
+        NOT_FOUND_MAP.put("존재하지 않는 채팅방입니다.", "NOT_FOUND_EXCEPTION_002");
 
         // ServerException
         SERVER_MAP.put("카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_001");
@@ -39,8 +41,8 @@ public class ExceptionCodeMapper {
         UNAUTHORIZED_MAP.put("로그아웃된 토큰입니다.", "UNAUTHORIZED_EXCEPTION_006");
         UNAUTHORIZED_MAP.put("이미 사용된 Refresh Token입니다.", "UNAUTHORIZED_EXCEPTION_007");
         UNAUTHORIZED_MAP.put("유효하지 않은 토큰입니다.", "UNAUTHORIZED_EXCEPTION_008");
-        UNAUTHORIZED_MAP.put("유효하지 않은 Refresh Token입니다.", "UNAUTHORIZED_EXCEPTION_008");
-        UNAUTHORIZED_MAP.put("JWT 토큰 처리 중 오류가 발생했습니다.", "UNAUTHORIZED_EXCEPTION_009");
+        UNAUTHORIZED_MAP.put("유효하지 않은 Refresh Token입니다.", "UNAUTHORIZED_EXCEPTION_009");
+        UNAUTHORIZED_MAP.put("JWT 토큰 처리 중 오류가 발생했습니다.", "UNAUTHORIZED_EXCEPTION_010");
     }
 
     public static String getCode(String message, ExceptionType type) {

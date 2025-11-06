@@ -78,7 +78,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "BAD_REQUEST_EXCEPTION_001", description = "요청 데이터 오류입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "BAD_REQUEST_EXCEPTION_002", description = "이미 회원가입된 사용자입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "CONFLICT_EXCEPTION_001", description = "이미 회원가입된 사용자입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "CONFLICT_EXCEPTION_002", description = "동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "SERVER_EXCEPTION_예외코드 설정하세요.", description = "서버 내부 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
@@ -142,7 +142,6 @@ public class UserController {
     @Operation(summary = "로그아웃 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "SERVER_EXCEPTION_예외코드 설정하세요.", description = "서버 내부 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<String>> logout(HttpServletRequest httpServletRequest, @RequestBody LogoutUserRequest request) {
         Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
@@ -229,7 +228,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "UNAUTHORIZED_EXCEPTION_005", description = "REFRESH 토큰만 사용할 수 있습니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "UNAUTHORIZED_EXCEPTION_007", description = "이미 사용된 Refresh Token입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "UNAUTHORIZED_EXCEPTION_008", description = "유효하지 않은 Refresh Token입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "UNAUTHORIZED_EXCEPTION_009", description = "유효하지 않은 Refresh Token입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<ReIssueTokenResponse>> reissueToken(@RequestBody ReIssueTokenRequest request) {
