@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,7 +61,12 @@ public class UserController {
                     회원가입이 되어 있지 않은 경우, 어플 회원 정보 (이름, 성별 .. etc)를 입력 받은 후 해당 정보들과 함께 type(Google, Kakao, Naver), id 데이터를 함께 보내주어야합니다.
                     """
     )
-    public void description() {
+    public ResponseEntity<BaseResponse<String>> description(HttpServletRequest request) {
+        Long userSeq = (Long) request.getAttribute("userSeq");
+        String type = (String) request.getAttribute("type");
+        String accessToken = (String) request.getAttribute("accessToken");
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), userSeq + type + accessToken));
     }
 
     @PostMapping(
