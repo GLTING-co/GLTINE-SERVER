@@ -160,18 +160,6 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Long userSeq) {
-        UserEntity userEntity = userRepository.findByUserSeq(userSeq)
-                .orElseThrow(() -> new NotFoundException(
-                        HttpStatus.NOT_FOUND.value(),
-                        "존재하지 않는 회원입니다.",
-                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
-                ));
-
-        userRepository.deleteUserEntity(userEntity);
-    }
-
-    @Transactional
     public ReIssueTokenResponse reissueToken(ReIssueTokenRequest request) {
         var claims = commonService.parseToken(request.refreshToken());
         String type = claims.get("type", String.class);

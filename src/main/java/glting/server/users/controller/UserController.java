@@ -221,19 +221,6 @@ public class UserController {
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 
-    @DeleteMapping
-    @Operation(summary = "회원 삭제 API")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
-    })
-    public ResponseEntity<BaseResponse<String>> delete(HttpServletRequest httpServletRequest) {
-        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
-        userService.delete(userSeq);
-
-        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
-    }
-
     @PostMapping("/reissue-token")
     @Operation(summary = "토큰 재발급 API")
     @ApiResponses(value = {
