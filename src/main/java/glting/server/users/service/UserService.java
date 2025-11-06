@@ -4,6 +4,7 @@ import glting.server.common.service.CommonService;
 import glting.server.exception.ConflictException;
 import glting.server.exception.NotFoundException;
 import glting.server.exception.ServerException;
+import glting.server.exception.UnauthorizedException;
 import glting.server.users.entity.UserEntity;
 import glting.server.users.repository.UserImageRepository;
 import glting.server.users.repository.UserRepository;
@@ -43,7 +44,7 @@ public class UserService {
                     throw new ConflictException(
                             HttpStatus.CONFLICT.value(),
                             "이미 회원가입된 사용자입니다.",
-                            getCode("이미 회원가입된 사용자입니다.", ExceptionType.BAD_REQUEST)
+                            getCode("이미 회원가입된 사용자입니다.", ExceptionType.CONFLICT)
                     );
                 });
 
@@ -65,7 +66,7 @@ public class UserService {
             throw new ConflictException(
                     HttpStatus.CONFLICT.value(),
                     "동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.",
-                    getCode("동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.", ExceptionType.BAD_REQUEST)
+                    getCode("동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.", ExceptionType.CONFLICT)
             );
         } catch (Exception e) {
             throw new ServerException(
@@ -168,5 +169,55 @@ public class UserService {
                 ));
 
         userRepository.deleteUserEntity(userEntity);
+    }
+
+    @Transactional
+    public ReIssueTokenResponse reissueToken(ReIssueTokenRequest request) {
+        var claims = commonService.parseToken(request.refreshToken());
+        String type = claims.get("type", String.class);
+        Long userSeq = ((Number) claims.get("userSeq")).longValue();
+        String social = claims.get("social", String.class);
+
+        if (!"REFRESH".equalsIgnoreCase(type)) {
+            throw new UnauthorizedException(
+                    HttpStatus.UNAUTHORIZED.value(),
+                    "REFRESH 토큰만 사용할 수 있습니다.",
+                    getCode("REFRESH 토큰만 사용할 수 있습니다.", ExceptionType.UNAUTHORIZED)
+            );
+        }
+
+        userRepository.findByUserSeq(userSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 회원입니다.",
+                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        if (!commonService.isTokenInWhiteList(userSeq, request.refreshToken())) {
+            throw new UnauthorizedException(
+                    HttpStatus.UNAUTHORIZED.value(),
+                    "유효하지 않은 Refresh Token입니다.",
+                    getCode("유효하지 않은 Refresh Token입니다.", ExceptionType.UNAUTHORIZED)
+            );
+        }
+
+        if (commonService.isTokenInBlackList(userSeq, request.refreshToken())) {
+            throw new UnauthorizedException(
+                    HttpStatus.UNAUTHORIZED.value(),
+                    "이미 사용된 Refresh Token입니다.",
+                    getCode("이미 사용된 Refresh Token입니다.", ExceptionType.UNAUTHORIZED)
+            );
+        }
+
+        commonService.deleteToken(userSeq, "WHITE");
+        commonService.saveToken(userSeq, "BLACK", request.refreshToken());
+
+        String accessToken = commonService.issueToken(userSeq, "ACCESS", social);
+        String refreshToken = commonService.issueToken(userSeq, "REFRESH", social);
+
+        commonService.saveToken(userSeq, "WHITE", accessToken);
+        commonService.saveToken(userSeq, "WHITE", refreshToken);
+
+        return new ReIssueTokenResponse(accessToken, refreshToken);
     }
 }
