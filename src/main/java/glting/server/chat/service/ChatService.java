@@ -6,10 +6,10 @@ import glting.server.chat.repository.ChatMessageRepository;
 import glting.server.chat.repository.ChatRoomRepository;
 import glting.server.exception.NotFoundException;
 import glting.server.users.entity.UserEntity;
-import glting.server.users.entity.UserImageEntity;
 import glting.server.users.repository.UserImageRepository;
 import glting.server.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -42,23 +42,24 @@ public class ChatService {
         return chatRoomRepository.findAllByHostSeq(hostSeq)
                 .stream()
                 .map(chatRoom -> {
-                    UserEntity guestEntity = chatRoom.getGuestEntity();
-                    UserImageEntity userImage = userImageRepository.findRepresentImageByUserSeq(guestEntity.getUserSeq());
+                    UserEntity guest = chatRoom.getGuestEntity();
+                    String image = userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq()).getImage();
 
-                    return new GetChatRoomListResponse(chatRoom.getChatRoomSeq(), userImage.getImage(), guestEntity.getOpen());
+                    return new GetChatRoomListResponse(chatRoom.getChatRoomSeq(), image, guest.getOpen());
                 })
                 .toList();
     }
 
     /**
-     * 호스트 사용자의 특정 채팅방 정보와 메시지 목록을 조회합니다.
+     * 호스트 사용자의 특정 채팅방 정보와 메시지 목록을 페이징하여 조회합니다.
      *
-     * @param hostSeq 호스트 사용자 고유 식별자(PK)
+     * @param hostSeq     호스트 사용자 고유 식별자(PK)
      * @param chatRoomSeq 채팅방 고유 식별자(PK)
-     * @return 채팅방 정보 및 메시지 목록
+     * @param pageable    페이징 정보
+     * @return 채팅방 정보 및 페이징된 메시지 목록
      */
     @Transactional(readOnly = true)
-    public List<GetChatRoomResponse> chatRoom(Long hostSeq, String chatRoomSeq) {
+    public GetChatRoomResponse chatRoom(Long hostSeq, String chatRoomSeq, Pageable pageable) {
         userRepository.findByUserSeq(hostSeq)
                 .orElseThrow(() -> new NotFoundException(
                         HttpStatus.NOT_FOUND.value(),
@@ -74,30 +75,27 @@ public class ChatService {
                 ));
 
         UserEntity guest = chatRoom.getGuestEntity();
-        UserImageEntity guestImage = userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq());
-
-        return List.of(new GetChatRoomResponse(
+        return new GetChatRoomResponse(
                 chatRoom.getChatRoomSeq(),
                 chatRoom.getCreatedAt(),
                 guest.getUserSeq(),
                 guest.getName(),
-                guestImage.getImage(),
+                userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq()).getImage(),
                 guest.getOpen(),
-                chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq).stream()
+                chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq, pageable)
                         .map(msg -> new GetChatRoomResponse.Message(
                                 msg.getMessage(),
                                 msg.getCreatedAt(),
                                 msg.getSenderEntity().getUserSeq().equals(hostSeq)
                         ))
-                        .toList()
-        ));
+        );
     }
 
     /**
      * 채팅 메시지를 전송하고 저장합니다.
      *
      * @param senderSeq 발신자 사용자 고유 식별자(PK)
-     * @param request 채팅 메시지 요청 (채팅방 식별자, 수신자 식별자, 메시지 내용)
+     * @param request   채팅 메시지 요청 (채팅방 식별자, 수신자 식별자, 메시지 내용)
      */
     @Transactional
     public void sendMessage(Long senderSeq, ChatMessageRequest request) {
