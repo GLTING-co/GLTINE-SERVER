@@ -80,7 +80,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
 
                 // WHITE 리스트에 있는지 확인 (유효한 토큰)
-                if (!commonService.isTokenInWhiteList(userSeq, token)) {
+                if (commonService.isTokenInWhiteList(userSeq, token)) {
                     throw new UnauthorizedException(
                             HttpStatus.UNAUTHORIZED.value(),
                             "유효하지 않은 토큰입니다.",

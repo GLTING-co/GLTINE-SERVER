@@ -2,9 +2,6 @@ package glting.server.config;
 
 import glting.server.common.service.CommonService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.server.ServerHttpRequest;
@@ -61,7 +58,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
                     return false;
                 }
 
-                if (!commonService.isTokenInWhiteList(userSeq, token)) {
+                if (commonService.isTokenInWhiteList(userSeq, token)) {
                     response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
                     return false;
                 }
