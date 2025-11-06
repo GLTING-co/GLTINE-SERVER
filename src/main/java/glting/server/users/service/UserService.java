@@ -73,4 +73,17 @@ public class UserService {
             );
         }
     }
+
+    /**
+     * 로그아웃 처리: WHITE 리스트에서 삭제 후 BLACK 리스트에 추가
+     *
+     * @param userSeq      사용자 고유 식별자(PK)
+     * @param accessToken  AccessToken
+     * @param refreshToken RefreshToken
+     */
+    public void logout(Long userSeq, String accessToken, String refreshToken) {
+        commonService.deleteToken(userSeq, "WHITE");
+        commonService.saveToken(userSeq, "BLACK", accessToken);
+        commonService.saveToken(userSeq, "BLACK", refreshToken);
+    }
 }
