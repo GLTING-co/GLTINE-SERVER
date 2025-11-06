@@ -34,7 +34,7 @@ public class ChatService {
                     UserEntity guestEntity = chatRoom.getGuestEntity();
                     UserImageEntity userImage = userImageRepository.findRepresentImageByUserSeq(guestEntity.getUserSeq());
 
-                    return new GetChatRoomListResponse(userImage.getImage(), guestEntity.getOpen());
+                    return new GetChatRoomListResponse(chatRoom.getChatRoomSeq(), userImage.getImage(), guestEntity.getOpen());
                 })
                 .toList();
     }
