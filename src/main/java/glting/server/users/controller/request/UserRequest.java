@@ -1,6 +1,11 @@
 package glting.server.users.controller.request;
 
 public class UserRequest {
+    public record SocialLoginRequest(
+            String accessToken
+    ) {
+    }
+
     public record NoAccountRequest(
             String type,
             String id,
