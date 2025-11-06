@@ -1,6 +1,5 @@
 package glting.server.users.repository;
 
-import glting.server.users.entity.UserImageEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -21,8 +20,8 @@ public class UserImageRepository {
      */
     public void saveAllUserImageUrls(Long userSeq, List<String> imageUrls) {
         final String sql = """
-                INSERT INTO user_image (user_seq, image, deleted)
-                VALUES (?, ?, false)
+                INSERT INTO user_image (user_seq, image, deleted, created_at, updated_at)
+                VALUES (?, ?, false, NOW(), NOW())
                 """;
 
         jdbcTemplate.batchUpdate(
