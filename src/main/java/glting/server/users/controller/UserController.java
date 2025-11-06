@@ -154,7 +154,24 @@ public class UserController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "회원 정보 수정 API")
+    @Operation(
+            summary = "회원 정보 수정 API",
+            description = """
+                    ### 요청 파라미터
+                    - bio: 자기소개
+                    - height: 키
+                    - job: 직업
+                    - company: 회사
+                    - school: 학교
+                    - city: 도시
+                    - smoking: 흡연 여부
+                      * 허용 값: NONE (흡연 안함), OCCASIONAL (가끔), REGULAR (자주)
+                    - drinking: 음주 여부
+                      * 허용 값: NONE (음주 안함), OCCASIONAL (가끔), REGULAR (자주)
+                    - religion: 종교
+                      * 허용 값: NONE (무교), CHRISTIAN (기독교), CATHOLIC (천주교), BUDDHIST (불교), ISLAM (이슬람), HINDU (힌두교), OTHER (기타)
+                    """
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "BAD_REQUEST_EXCEPTION_001", description = "요청 데이터 오류입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
