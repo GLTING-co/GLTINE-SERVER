@@ -1,0 +1,136 @@
+package glting.server.chat.service;
+
+import glting.server.chat.entity.ChatMessageEntity;
+import glting.server.chat.entity.ChatRoomEntity;
+import glting.server.chat.repository.ChatMessageRepository;
+import glting.server.chat.repository.ChatRoomRepository;
+import glting.server.exception.NotFoundException;
+import glting.server.users.entity.UserEntity;
+import glting.server.users.entity.UserImageEntity;
+import glting.server.users.repository.UserImageRepository;
+import glting.server.users.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static glting.server.chat.controller.request.ChatRequest.ChatMessageRequest;
+import static glting.server.chat.controller.response.ChatResponse.*;
+import static glting.server.exception.code.ExceptionCodeMapper.*;
+import static glting.server.exception.code.ExceptionCodeMapper.getCode;
+
+@Service
+@RequiredArgsConstructor
+public class ChatService {
+    private final UserRepository userRepository;
+    private final UserImageRepository userImageRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
+
+    /**
+     * 호스트 사용자의 채팅방 목록을 조회합니다.
+     *
+     * @param hostSeq 호스트 사용자 고유 식별자(PK)
+     * @return 채팅방 목록 (게스트 프로필 이미지, 공개 여부 포함)
+     */
+    @Transactional(readOnly = true)
+    public List<GetChatRoomListResponse> chatRoomList(Long hostSeq) {
+        return chatRoomRepository.findAllByHostSeq(hostSeq)
+                .stream()
+                .map(chatRoom -> {
+                    UserEntity guestEntity = chatRoom.getGuestEntity();
+                    UserImageEntity userImage = userImageRepository.findRepresentImageByUserSeq(guestEntity.getUserSeq());
+
+                    return new GetChatRoomListResponse(chatRoom.getChatRoomSeq(), userImage.getImage(), guestEntity.getOpen());
+                })
+                .toList();
+    }
+
+    /**
+     * 호스트 사용자의 특정 채팅방 정보와 메시지 목록을 조회합니다.
+     *
+     * @param hostSeq 호스트 사용자 고유 식별자(PK)
+     * @param chatRoomSeq 채팅방 고유 식별자(PK)
+     * @return 채팅방 정보 및 메시지 목록
+     */
+    @Transactional(readOnly = true)
+    public List<GetChatRoomResponse> chatRoom(Long hostSeq, String chatRoomSeq) {
+        userRepository.findByUserSeq(hostSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 회원입니다.",
+                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        ChatRoomEntity chatRoom = chatRoomRepository.findByChatRoomSeq(chatRoomSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 채팅방입니다.",
+                        getCode("존재하지 않는 채팅방입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        UserEntity guest = chatRoom.getGuestEntity();
+        UserImageEntity guestImage = userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq());
+
+        return List.of(new GetChatRoomResponse(
+                chatRoom.getChatRoomSeq(),
+                chatRoom.getCreatedAt(),
+                guest.getUserSeq(),
+                guest.getName(),
+                guestImage.getImage(),
+                guest.getOpen(),
+                chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq).stream()
+                        .map(msg -> new GetChatRoomResponse.Message(
+                                msg.getMessage(),
+                                msg.getCreatedAt(),
+                                msg.getSenderEntity().getUserSeq().equals(hostSeq)
+                        ))
+                        .toList()
+        ));
+    }
+
+    /**
+     * 채팅 메시지를 전송하고 저장합니다.
+     *
+     * @param senderSeq 발신자 사용자 고유 식별자(PK)
+     * @param request 채팅 메시지 요청 (채팅방 식별자, 수신자 식별자, 메시지 내용)
+     */
+    @Transactional
+    public void sendMessage(Long senderSeq, ChatMessageRequest request) {
+        UserEntity senderEntity = userRepository.findByUserSeq(senderSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 회원입니다.",
+                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        UserEntity receiverEntity = userRepository.findByUserSeq(request.receiverSeq())
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 회원입니다.",
+                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findByChatRoomSeq(request.chatRoomSeq())
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 채팅방입니다.",
+                        getCode("존재하지 않는 채팅방입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        ChatMessageEntity chatMessage = ChatMessageEntity.builder()
+                .chatRoomEntity(chatRoomEntity)
+                .message(request.message())
+                .senderEntity(senderEntity)
+                .receiverEntity(receiverEntity)
+                .build();
+
+        chatMessageRepository.save(chatMessage);
+
+        messagingTemplate.convertAndSend("/sub/chat/room/" + request.chatRoomSeq(), request);
+    }
+}

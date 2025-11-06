@@ -26,12 +26,14 @@ public class UserRepository {
     private final JPAQueryFactory queryFactory;
     private final UserMapper userMapper;
 
+    /**
+     * 사용자 엔티티를 저장합니다.
+     *
+     * @param userEntity 저장할 사용자 엔티티
+     * @return 저장된 사용자 엔티티
+     */
     public UserEntity saveUserEntity(UserEntity userEntity) {
         return userJpaRepository.save(userEntity);
-    }
-
-    public void flush() {
-        userJpaRepository.flush();
     }
 
     /**
@@ -41,7 +43,7 @@ public class UserRepository {
      * @param type     소셜 플랫폼 종류 (KAKAO, NAVER, GOOGLE)
      * @return 해당 소셜 계정에 연결된 사용자 엔티티
      */
-    public Optional<UserEntity> findBySocialId(Long socialId, String type) {
+    public Optional<UserEntity> findBySocialId(String socialId, String type) {
         QUserEntity userEntity = QUserEntity.userEntity;
 
         BooleanExpression condition = switch (type.toUpperCase()) {
@@ -90,12 +92,13 @@ public class UserRepository {
     }
 
 
-    public UserEntity findByUserSeq(Long userSeq) {
-
-        return userJpaRepository.findByUserSeq(userSeq).orElseThrow(() -> new NotFoundException(
-                HttpStatus.NOT_FOUND.value(),
-                "존재하지 않은 회원입니다.",
-                getCode("존재하지 않은 회원입니다.", ExceptionType.SERVER)));
+    /**
+     * 사용자 고유 식별자로 사용자를 조회합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @return 사용자 엔티티 (존재하지 않으면 Optional.empty())
+     */
+    public Optional<UserEntity> findByUserSeq(Long userSeq) {
+        return userJpaRepository.findById(userSeq);
     }
-
 }

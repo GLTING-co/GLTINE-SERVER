@@ -29,6 +29,7 @@ public class UserEntity extends BaseTimeEntity {
     @Column(name = "user_seq")
     private Long userSeq;
 
+    // ==== 온보딩 ====
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -44,20 +45,64 @@ public class UserEntity extends BaseTimeEntity {
     @Column(name = "relationship", nullable = false)
     private String relationship;
 
+    // ==== 정보 업데이트 ====
+    @Column(name = "bio", nullable = true, unique = false, columnDefinition = "LONGTEXT")
+    private String bio;
+
+    @Column(name = "height", nullable = true, unique = false)
+    private Integer height;
+
+    @Column(name = "job_title", nullable = true, unique = false)
+    private String job;
+
+    @Column(name = "company", nullable = true, unique = false)
+    private String company;
+
+    @Column(name = "school", nullable = true, unique = false)
+    private String school;
+
+    @Column(name = "city", nullable = true, unique = false)
+    private String city;
+
+    // ===== 라이프스타일 =====
+    @Column(name = "smoking", nullable = true, unique = false)
+    private String smoking; // 예: NONE, OCCASIONAL, REGULAR
+
+    @Column(name = "drinking", nullable = true, unique = false)
+    private String drinking; // 예: NONE, OCCASIONAL, REGULAR
+
+    @Column(name = "religion", nullable = true, unique = false)
+    private String religion; // 예: NONE, CHRISTIAN, CATHOLIC, BUDDHIST, ISLAM, HINDU, OTHER
+
+    // ==== 소셜 로그인 ====
     @Column(name = "kakao_id", nullable = true, unique = true)
-    private Long kakaoId;
+    private String kakaoId;
 
     @Column(name = "naver_id", nullable = true, unique = true)
-    private Long naverId;
+    private String naverId;
 
     @Column(name = "google_id", nullable = true, unique = true)
-    private Long googleId;
+    private String googleId;
+
+    // ==== 프로필 공개 여뷰 ====
+    @Builder.Default
+    @Column(name = "open", nullable = false, unique = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean open = false;
+
+    // ==== TODO 추후 유료화 예정 ====
+    @Column(name = "plan", nullable = true, unique = false)
+    private String plan; // 예: NONE, ----
 
     @Builder.Default
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean deleted = false;
 
-    public void updateSocialId(String type, Long socialId) {
+    @Version
+    @Builder.Default
+    @Column(name = "version", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer version = 0;
+
+    public void updateSocialId(String type, String socialId) {
         switch (type.toUpperCase()) {
             case "GOOGLE" -> this.googleId = socialId;
             case "NAVER" -> this.naverId = socialId;
@@ -68,5 +113,32 @@ public class UserEntity extends BaseTimeEntity {
                     getCode("type 종류가 잘못됐습니다.", BAD_REQUEST)
             );
         }
+    }
+
+    /**
+     * 사용자 정보를 업데이트합니다.
+     *
+     * @param bio      자기소개
+     * @param height   키
+     * @param job      직업
+     * @param company  회사
+     * @param school   학교
+     * @param city     도시
+     * @param smoking  흡연 여부 (NONE, OCCASIONAL, REGULAR)
+     * @param drinking 음주 여부 (NONE, OCCASIONAL, REGULAR)
+     * @param religion 종교 (NONE, CHRISTIAN, CATHOLIC, BUDDHIST, ISLAM, HINDU, OTHER)
+     */
+    public void updateUser(String bio, Integer height, String job, String company, String school,
+                           String city, String smoking, String drinking, String religion, Boolean open) {
+        this.bio = bio;
+        this.height = height;
+        this.job = job;
+        this.company = company;
+        this.school = school;
+        this.city = city;
+        this.smoking = smoking;
+        this.drinking = drinking;
+        this.religion = religion;
+        this.open = open;
     }
 }
