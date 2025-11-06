@@ -31,7 +31,8 @@ public class UserRequest {
             String city,
             String smoking,
             String drinking,
-            String religion
+            String religion,
+            Boolean open
     ) {
     }
 
