@@ -107,6 +107,22 @@ public class CommonService {
     }
 
     /**
+     * Redis에서 토큰을 삭제합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @param type    삭제할 리스트 타입 ("WHITE" 또는 "BLACK")
+     *                - "WHITE": auth:whitelist:{userSeq} 키 삭제
+     *                - "BLACK": auth:blacklist:{userSeq} 키 삭제
+     */
+    public void deleteToken(Long userSeq, String type) {
+        String key = "";
+        if (type.equalsIgnoreCase("WHITE")) key = String.format(WHITE_KEY_FMT, userSeq);
+        if (type.equalsIgnoreCase("BLACK")) key = String.format(BLACK_KEY_FMT, userSeq);
+
+        redisTemplate.delete(key);
+    }
+
+    /**
      * JWT 토큰이 WHITE 리스트에 있는지 확인합니다.
      *
      * @param userSeq 사용자 고유 식별자(PK)
