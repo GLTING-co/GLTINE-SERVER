@@ -28,7 +28,7 @@
     </insert>
 
 
-    <select id="findRecommendation" resultType="glting.server.users.controller.vo.response.UserProfileResponse">
+    <select id="findRecommendation" resultType="glting.server.recommendation.controller.response.RecommendationResponse$UserProfileResponse">
         SELECT
         u.user_seq           AS userSeq,
         u.name               AS name,
