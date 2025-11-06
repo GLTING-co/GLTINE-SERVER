@@ -2,6 +2,7 @@ package glting.server.users.service;
 
 import glting.server.common.service.CommonService;
 import glting.server.exception.ConflictException;
+import glting.server.exception.NotFoundException;
 import glting.server.exception.ServerException;
 import glting.server.users.entity.UserEntity;
 import glting.server.users.repository.UserImageRepository;
@@ -34,7 +35,7 @@ public class UserService {
      * @param images  프로필 이미지 MultipartFile 리스트
      */
     @Transactional
-    public void registerUser(NoAccountRequest request, List<MultipartFile> images) {
+    public void register(NoAccountRequest request, List<MultipartFile> images) {
         userRepository.findBySocialId(request.id(), request.type().toUpperCase())
                 .ifPresent(userEntity -> {
                     throw new ConflictException(
@@ -81,9 +82,37 @@ public class UserService {
      * @param accessToken  AccessToken
      * @param refreshToken RefreshToken
      */
+    @Transactional
     public void logout(Long userSeq, String accessToken, String refreshToken) {
         commonService.deleteToken(userSeq, "WHITE");
         commonService.saveToken(userSeq, "BLACK", accessToken);
         commonService.saveToken(userSeq, "BLACK", refreshToken);
+    }
+
+    @Transactional
+    public void update(Long userSeq, UpdateUserRequest request, List<MultipartFile> images) {
+        UserEntity userEntity = userRepository.findByUserSeq(userSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 회원입니다.",
+                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        userImageRepository.deleteAllByUserSeq(userSeq);
+        List<String> imageUrls = commonService.uploadJPGFileList(images);
+        userImageRepository.saveAllUserImageUrls(userEntity.getUserSeq(), imageUrls);
+
+        userEntity.updateUser(
+                request.bio(),
+                request.height(),
+                request.job(),
+                request.company(),
+                request.school(),
+                request.city(),
+                request.smoking(),
+                request.drinking(),
+                request.religion()
+        );
+        userRepository.saveUserEntity(userEntity);
     }
 }
