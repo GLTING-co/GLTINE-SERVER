@@ -106,6 +106,45 @@ public class CommonService {
         }
     }
 
+    /**
+     * JWT 토큰이 WHITE 리스트에 있는지 확인합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @param token   확인할 JWT 토큰 문자열
+     * @return WHITE 리스트에 토큰이 존재하면 true, 아니면 false
+     */
+    public boolean isTokenInWhiteList(Long userSeq, String token) {
+        String key = String.format(WHITE_KEY_FMT, userSeq);
+        String storedToken = redisTemplate.opsForValue().get(key);
+        return storedToken != null && storedToken.equals(token);
+    }
+
+    /**
+     * JWT 토큰이 BLACK 리스트에 있는지 확인합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @param token   확인할 JWT 토큰 문자열
+     * @return BLACK 리스트에 토큰이 존재하면 true, 아니면 false
+     */
+    public boolean isTokenInBlackList(Long userSeq, String token) {
+        String key = String.format(BLACK_KEY_FMT, userSeq);
+        String storedToken = redisTemplate.opsForValue().get(key);
+        return storedToken != null && storedToken.equals(token);
+    }
+
+    /**
+     * JWT 토큰에서 Claims를 추출합니다.
+     *
+     * @param token JWT 토큰 문자열
+     * @return Claims 객체
+     */
+    public Claims parseToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public String uploadJPGFile(MultipartFile multipartFile) {
         try {
             String fileName = randomUUID().toString() + ".jpg";
