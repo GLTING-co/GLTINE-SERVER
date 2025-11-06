@@ -20,8 +20,8 @@ public class UserImageRepository {
      */
     public void saveAllUserImageUrls(Long userSeq, List<String> imageUrls) {
         final String sql = """
-                INSERT INTO user_image (user_seq, image, deleted)
-                VALUES (?, ?, false)
+                INSERT INTO user_image (user_seq, image, deleted, created_at, updated_at)
+                VALUES (?, ?, false, NOW(), NOW())
                 """;
 
         jdbcTemplate.batchUpdate(
@@ -33,5 +33,9 @@ public class UserImageRepository {
                     ps.setString(2, url);
                 }
         );
+    }
+
+    public void deleteAllByUserSeq(Long userSeq) {
+        userImageJpaRepository.deleteAllByUserSeq(userSeq);
     }
 }

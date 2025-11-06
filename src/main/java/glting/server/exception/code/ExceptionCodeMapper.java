@@ -18,9 +18,10 @@ public class ExceptionCodeMapper {
         // ConflictException
         CONFLICT_MAP.put("이미 회원가입된 사용자입니다.", "CONFLICT_EXCEPTION_001");
         CONFLICT_MAP.put("동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.", "CONFLICT_EXCEPTION_002");
+        CONFLICT_MAP.put("다른 요청이 먼저 수정했습니다. 다시 시도해주세요.", "CONFLICT_EXCEPTION_003");
 
         // NotFoundException
-        NOT_FOUND_MAP.put("", "NOT_FOUND_EXCEPTION_001");
+        NOT_FOUND_MAP.put("존재하지 않는 회원입니다.", "NOT_FOUND_EXCEPTION_001");
 
         // ServerException
         SERVER_MAP.put("카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_001");
@@ -32,6 +33,12 @@ public class ExceptionCodeMapper {
 
         // UnauthorizedException
         UNAUTHORIZED_MAP.put("", "UNAUTHORIZED_EXCEPTION_001");
+        UNAUTHORIZED_MAP.put("만료된 JWT 입니다.", "UNAUTHORIZED_EXCEPTION_002");
+        UNAUTHORIZED_MAP.put("잘못된 JWT 입니다.", "UNAUTHORIZED_EXCEPTION_003");
+        UNAUTHORIZED_MAP.put("ACCESS 토큰만 사용할 수 있습니다.", "UNAUTHORIZED_EXCEPTION_004");
+        UNAUTHORIZED_MAP.put("로그아웃된 토큰입니다.", "UNAUTHORIZED_EXCEPTION_005");
+        UNAUTHORIZED_MAP.put("유효하지 않은 토큰입니다.", "UNAUTHORIZED_EXCEPTION_006");
+        UNAUTHORIZED_MAP.put("JWT 토큰 처리 중 오류가 발생했습니다.", "UNAUTHORIZED_EXCEPTION_007");
     }
 
     public static String getCode(String message, ExceptionType type) {

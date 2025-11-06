@@ -16,4 +16,22 @@ public class UserRequest {
             String relationship
     ) {
     }
+
+    public record LogoutUserRequest(
+            String refreshToken
+    ) {
+    }
+
+    public record UpdateUserRequest(
+            String bio,
+            Integer height,
+            String job,
+            String company,
+            String school,
+            String city,
+            String smoking,
+            String drinking,
+            String religion
+    ) {
+    }
 }

@@ -106,6 +106,61 @@ public class CommonService {
         }
     }
 
+    /**
+     * Redis에서 토큰을 삭제합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @param type    삭제할 리스트 타입 ("WHITE" 또는 "BLACK")
+     *                - "WHITE": auth:whitelist:{userSeq} 키 삭제
+     *                - "BLACK": auth:blacklist:{userSeq} 키 삭제
+     */
+    public void deleteToken(Long userSeq, String type) {
+        String key = "";
+        if (type.equalsIgnoreCase("WHITE")) key = String.format(WHITE_KEY_FMT, userSeq);
+        if (type.equalsIgnoreCase("BLACK")) key = String.format(BLACK_KEY_FMT, userSeq);
+
+        redisTemplate.delete(key);
+    }
+
+    /**
+     * JWT 토큰이 WHITE 리스트에 있는지 확인합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @param token   확인할 JWT 토큰 문자열
+     * @return WHITE 리스트에 토큰이 존재하면 true, 아니면 false
+     */
+    public boolean isTokenInWhiteList(Long userSeq, String token) {
+        String key = String.format(WHITE_KEY_FMT, userSeq);
+        String storedToken = redisTemplate.opsForValue().get(key);
+        return storedToken != null && storedToken.equals(token);
+    }
+
+    /**
+     * JWT 토큰이 BLACK 리스트에 있는지 확인합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @param token   확인할 JWT 토큰 문자열
+     * @return BLACK 리스트에 토큰이 존재하면 true, 아니면 false
+     */
+    public boolean isTokenInBlackList(Long userSeq, String token) {
+        String key = String.format(BLACK_KEY_FMT, userSeq);
+        String storedToken = redisTemplate.opsForValue().get(key);
+        return storedToken != null && storedToken.equals(token);
+    }
+
+    /**
+     * JWT 토큰에서 Claims를 추출합니다.
+     *
+     * @param token JWT 토큰 문자열
+     * @return Claims 객체
+     */
+    public Claims parseToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public String uploadJPGFile(MultipartFile multipartFile) {
         try {
             String fileName = randomUUID().toString() + ".jpg";

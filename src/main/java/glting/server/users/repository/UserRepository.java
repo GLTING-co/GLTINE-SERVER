@@ -47,4 +47,12 @@ public class UserRepository {
 
         return Optional.ofNullable(result);
     }
+
+    public Optional<UserEntity> findByUserSeq(Long userSeq) {
+        return userJpaRepository.findById(userSeq);
+    }
+
+    public void deleteUserEntity(UserEntity userEntity) {
+        userJpaRepository.delete(userEntity);
+    }
 }

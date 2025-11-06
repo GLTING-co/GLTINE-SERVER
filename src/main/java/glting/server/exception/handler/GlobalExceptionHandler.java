@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,6 +16,8 @@ import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static glting.server.exception.code.ExceptionCodeMapper.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -46,9 +49,30 @@ public class GlobalExceptionHandler {
                     .body(new ErrorResponse(ex.getHttpStatus(), ex.getMessage(), ex.getCode()));
         }
 
-        log.error("Unhandled exception caught: ", exception);
         return ResponseEntity.status(500)
                 .body(new ErrorResponse(500, "서버 내부 오류", "INTERNAL_SERVER_ERROR"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(final Exception exception, final HttpServletRequest request) {
+        String code = getCode(exception.getMessage(), ExceptionType.SERVER);
+        String methodName = exception.getStackTrace().length > 0
+                ? exception.getStackTrace()[0].toString()
+                : "UNKNOWN";
+
+        String requestBody = getRequestBody(request);
+
+        exceptionLogService.saveExceptionLogEntity(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                code,
+                exception.getMessage(),
+                request.getRequestURI(),
+                methodName,
+                requestBody
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage(), code));
     }
 
     private String getRequestBody(HttpServletRequest request) {
