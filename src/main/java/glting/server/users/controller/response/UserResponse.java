@@ -30,4 +30,10 @@ public class UserResponse {
             String religion
     ) {
     }
+
+    public record ReIssueTokenResponse(
+            String accessToken,
+            String refreshToken
+    ) {
+    }
 }
