@@ -91,6 +91,13 @@ public class UserService {
         commonService.saveToken(userSeq, "BLACK", refreshToken);
     }
 
+    /**
+     * 사용자 프로필 정보를 업데이트합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @param request 업데이트할 사용자 정보 (bio, height, job, company, school, city, smoking, drinking, religion, open)
+     * @param images 새로운 프로필 이미지 파일 목록
+     */
     @Transactional
     public void update(Long userSeq, UpdateUserRequest request, List<MultipartFile> images) {
         UserEntity userEntity = userRepository.findByUserSeq(userSeq)
@@ -114,7 +121,8 @@ public class UserService {
                     request.city(),
                     request.smoking(),
                     request.drinking(),
-                    request.religion()
+                    request.religion(),
+                    request.open()
             );
             userRepository.saveUserEntity(userEntity);
         } catch (OptimisticLockException e) {
@@ -132,6 +140,12 @@ public class UserService {
         }
     }
 
+    /**
+     * 사용자 프로필 정보를 조회합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @return 사용자 프로필 정보 (이름, 생년월일, 성별, 성향, 관계 상태, 자기소개, 키, 직업, 회사, 학교, 도시, 흡연, 음주, 종교, 공개 여부)
+     */
     @Transactional(readOnly = true)
     public GetUserResponse get(Long userSeq) {
         UserEntity userEntity = userRepository.findByUserSeq(userSeq)
@@ -155,10 +169,18 @@ public class UserService {
                 userEntity.getCity(),
                 userEntity.getSmoking(),
                 userEntity.getDrinking(),
-                userEntity.getReligion()
+                userEntity.getReligion(),
+                userEntity.getOpen()
         );
     }
 
+    /**
+     * Refresh Token을 사용하여 새로운 Access Token과 Refresh Token을 재발급합니다.
+     * Refresh Token Rotation 패턴을 사용하여 기존 Refresh Token은 BLACK 리스트에 추가됩니다.
+     *
+     * @param request Refresh Token이 포함된 요청
+     * @return 새로 발급된 Access Token과 Refresh Token
+     */
     @Transactional
     public ReIssueTokenResponse reissueToken(ReIssueTokenRequest request) {
         var claims = commonService.parseToken(request.refreshToken());
