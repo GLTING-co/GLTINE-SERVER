@@ -38,8 +38,8 @@ public class NaverDomain {
     public Mono<NaverTokenResponse> getNaverAccessToken(String code) {
         try {
             String apiURL = String.format(
-                "%s/oauth2.0/token?grant_type=authorization_code&client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&state=RANDOM_STATE",
-                NAVER_AUTH_BASE_URL, naverClientId, naverClientSecret, naverRedirectURL, code
+                    "%s/oauth2.0/token?grant_type=authorization_code&client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&state=RANDOM_STATE",
+                    NAVER_AUTH_BASE_URL, naverClientId, naverClientSecret, naverRedirectURL, code
             );
 
             return webClientConfig.createWebClient("").get()
@@ -54,8 +54,8 @@ public class NaverDomain {
                     .onErrorMap(
                             e -> new ServerException(
                                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                    "네이버 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.",
-                                    getCode("네이버 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", ExceptionType.SERVER)
+                                    e.getMessage(),
+                                    getCode(e.getMessage(), ExceptionType.SERVER)
                             )
                     );
         } catch (Exception e) {
@@ -97,8 +97,8 @@ public class NaverDomain {
                     .onErrorMap(
                             e -> new ServerException(
                                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                    "네이버 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.",
-                                    getCode("네이버 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", ExceptionType.SERVER)
+                                    e.getMessage(),
+                                    getCode(e.getMessage(), ExceptionType.SERVER)
                             )
                     );
         } catch (Exception e) {
@@ -122,8 +122,8 @@ public class NaverDomain {
     public Mono<NaverLogoutResponse> logout(String accessToken) {
         try {
             String apiURL = String.format(
-                "%s/oauth2.0/token?grant_type=delete&client_id=%s&client_secret=%s&access_token=%s&service_provider=NAVER",
-                NAVER_AUTH_BASE_URL, naverClientId, naverClientSecret, accessToken
+                    "%s/oauth2.0/token?grant_type=delete&client_id=%s&client_secret=%s&access_token=%s&service_provider=NAVER",
+                    NAVER_AUTH_BASE_URL, naverClientId, naverClientSecret, accessToken
             );
 
             return webClientConfig.createWebClient("").get()
@@ -136,8 +136,8 @@ public class NaverDomain {
                     .onErrorMap(e ->
                             new ServerException(
                                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                    "네이버 로그아웃 호출 중 오류가 발생했습니다.",
-                                    getCode("네이버 로그아웃 호출 중 오류가 발생했습니다.", ExceptionType.SERVER)
+                                    e.getMessage(),
+                                    getCode(e.getMessage(), ExceptionType.SERVER)
                             )
                     );
         } catch (Exception e) {

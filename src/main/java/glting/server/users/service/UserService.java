@@ -65,8 +65,8 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException(
                     HttpStatus.CONFLICT.value(),
-                    "동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.",
-                    getCode("동일한 소셜 ID로 이미 가입된 사용자가 존재합니다.", ExceptionType.CONFLICT)
+                    e.getMessage(),
+                    getCode(e.getMessage(), ExceptionType.CONFLICT)
             );
         } catch (Exception e) {
             throw new ServerException(
@@ -129,8 +129,8 @@ public class UserService {
         } catch (OptimisticLockException e) {
             throw new ConflictException(
                     HttpStatus.CONFLICT.value(),
-                    "다른 요청이 먼저 수정했습니다. 다시 시도해주세요.",
-                    getCode("다른 요청이 먼저 수정했습니다. 다시 시도해주세요.", ExceptionType.CONFLICT)
+                    e.getMessage(),
+                    getCode(e.getMessage(), ExceptionType.CONFLICT)
             );
         } catch (Exception e) {
             throw new ServerException(
