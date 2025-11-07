@@ -74,6 +74,7 @@ public class SecurityConfiguration {
 
                 // 운영자
                 "/admin/**",
+                "/api/user-service/register",
                 "/api/user-service/login/**",
                 "/api/user-service/reissue-token/**"
         );

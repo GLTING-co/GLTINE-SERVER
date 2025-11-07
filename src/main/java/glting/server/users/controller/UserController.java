@@ -72,6 +72,7 @@ public class UserController {
     }
 
     @PostMapping(
+            value = "/register",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
