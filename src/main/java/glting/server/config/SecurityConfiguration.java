@@ -74,9 +74,8 @@ public class SecurityConfiguration {
 
                 // 운영자
                 "/admin/**",
-
-                // 모든 URL 개방
-                "/**"
+                "/api/user-service/login/**",
+                "/api/user-service/reissue-token/**"
         );
         return new JwtTokenFilter(commonService, permitAllEndpoints);
     }

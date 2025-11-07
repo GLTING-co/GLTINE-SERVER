@@ -53,7 +53,7 @@ public class ChatController {
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않는 채팅방입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<GetChatRoomResponse>> chatRoom(
-            @RequestParam(value = "chatRoomSeq") String chatRoomSeq,
+            @RequestParam(value = "chatRoomSeq") @Schema(description = "채팅방 고유 SEQ - UUID") String chatRoomSeq,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
             HttpServletRequest httpServletRequest
