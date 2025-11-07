@@ -35,7 +35,6 @@ public class KakaoService {
                                     String access = commonService.issueToken(user.getUserSeq(), "ACCESS", "Kakao");
                                     String refresh = commonService.issueToken(user.getUserSeq(), "REFRESH", "Kakao");
                                     commonService.saveToken(user.getUserSeq(), "WHITE", access);
-                                    commonService.saveToken(user.getUserSeq(), "WHITE", refresh);
 
                                     return (Object) new LoginResponse(access, refresh);
                                 })
