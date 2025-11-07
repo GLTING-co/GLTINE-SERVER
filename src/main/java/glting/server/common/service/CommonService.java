@@ -137,7 +137,7 @@ public class CommonService {
     public boolean isTokenInWhiteList(Long userSeq, String token) {
         String key = String.format(WHITE_KEY_FMT, userSeq);
         String storedToken = redisTemplate.opsForValue().get(key);
-        return storedToken == null || !storedToken.equals(token);
+        return storedToken != null && storedToken.equals(token);
     }
 
     /**
