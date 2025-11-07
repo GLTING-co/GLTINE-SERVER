@@ -58,8 +58,8 @@ public class KakaoDomain {
                     .onErrorMap(
                             e -> new ServerException(
                                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                    "카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.",
-                                    getCode("카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", ExceptionType.SERVER)
+                                    e.getMessage(),
+                                    getCode(e.getMessage(), ExceptionType.SERVER)
                             )
                     );
         } catch (Exception e) {
@@ -98,8 +98,8 @@ public class KakaoDomain {
                     .onErrorMap(
                             e -> new ServerException(
                                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                    "카카오 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.",
-                                    getCode("카카오 로그인 요청 시 사용자 정보 수집 오류가 발생했습니다.", ExceptionType.SERVER)
+                                    e.getMessage(),
+                                    getCode(e.getMessage(), ExceptionType.SERVER)
                             )
                     );
         } catch (Exception e) {
@@ -134,8 +134,8 @@ public class KakaoDomain {
                     .onErrorMap(e ->
                             new ServerException(
                                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                    "카카오 로그아웃 호출 중 오류가 발생했습니다.",
-                                    getCode("카카오 로그아웃 호출 중 오류가 발생했습니다.", ExceptionType.SERVER)
+                                    e.getMessage(),
+                                    getCode(e.getMessage(), ExceptionType.SERVER)
                             )
                     );
         } catch (Exception e) {
