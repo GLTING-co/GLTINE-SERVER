@@ -166,10 +166,10 @@ public class UserService {
     @Transactional(readOnly = true)
     public GetUserResponse get(Long hostSeq, Long userSeq) {
         userRepository.findByUserSeq(hostSeq)
-                .orElseThrow(() -> new NotFoundException(
-                        HttpStatus.NOT_FOUND.value(),
+                .orElseThrow(() -> new UnauthorizedException(
+                        HttpStatus.UNAUTHORIZED.value(),
                         "존재하지 않는 요청자 SEQ입니다.",
-                        getCode("존재하지 않는 요청자 SEQ입니다.", ExceptionType.NOT_FOUND)
+                        getCode("존재하지 않는 요청자 SEQ입니다.", ExceptionType.UNAUTHORIZED)
                 ));
 
         return get(userSeq);
