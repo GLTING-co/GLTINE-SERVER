@@ -1,5 +1,6 @@
 package glting.server.swipe.entity;
 
+import glting.server.users.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,11 +20,13 @@ public class SwipeEntity {
     @Column(name = "swipe_seq")
     private Long swipeSeq;
 
-    @Column(name = "from_user_seq", nullable = false)
-    private Long fromUserSeq; // 스와이프한 사람 (나)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_user_seq", nullable = false)
+    private UserEntity fromUserSeq; // 스와이프한 사람 (나)
 
-    @Column(name = "to_user_seq", nullable = false)
-    private Long toUserSeq;   // 스와이프 당한 사람
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_user_seq", nullable = false)
+    private UserEntity toUserSeq;   // 스와이프 당한 사람
 
     @Column(name = "liked", nullable = false)
     private Boolean liked;    // true: 좋아요, false: 싫어요

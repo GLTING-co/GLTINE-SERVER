@@ -2,7 +2,6 @@ package glting.server.recommendation.service;
 
 import glting.server.exception.NotFoundException;
 import glting.server.exception.code.ExceptionCodeMapper;
-import glting.server.swipe.repository.SwipeRepository;
 import glting.server.users.entity.UserEntity;
 import glting.server.users.entity.UserImageEntity;
 import glting.server.users.repository.UserRepository;
@@ -24,7 +23,6 @@ import static glting.server.users.controller.response.UserResponse.*;
 @RequiredArgsConstructor
 public class RecommendationService {
     private final UserRepository userRepository;
-    private final SwipeRepository swipeRepository;
 
 
     /**
