@@ -12,6 +12,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
+
 import static glting.server.exception.code.ExceptionCodeMapper.ExceptionType.BAD_REQUEST;
 import static glting.server.exception.code.ExceptionCodeMapper.getCode;
 
@@ -34,7 +36,7 @@ public class UserEntity extends BaseTimeEntity {
     private String name;
 
     @Column(name = "birth", nullable = false)
-    private String birth;
+    private LocalDate birth;
 
     @Column(name = "gender", nullable = false)
     private String gender;

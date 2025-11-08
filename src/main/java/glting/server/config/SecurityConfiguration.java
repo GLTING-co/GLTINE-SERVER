@@ -76,7 +76,11 @@ public class SecurityConfiguration {
                 "/admin/**",
                 "/api/user-service/register",
                 "/api/user-service/login/**",
-                "/api/user-service/reissue-token/**"
+                "/api/user-service/reissue-token/**",
+
+
+                // 테스트
+                "/api/recommendations"
         );
         return new JwtTokenFilter(commonService, permitAllEndpoints);
     }

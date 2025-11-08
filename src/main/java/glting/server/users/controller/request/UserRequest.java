@@ -1,5 +1,7 @@
 package glting.server.users.controller.request;
 
+import java.time.LocalDate;
+
 public class UserRequest {
     public record SocialLoginRequest(
             String accessToken
@@ -10,7 +12,7 @@ public class UserRequest {
             String type,
             String id,
             String name,
-            String birth,
+            LocalDate birth,
             String gender,
             String sexualType,
             String relationship
