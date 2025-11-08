@@ -24,6 +24,7 @@ public class ExceptionCodeMapper {
         // NotFoundException
         NOT_FOUND_MAP.put("존재하지 않는 회원입니다.", "NOT_FOUND_EXCEPTION_001");
         NOT_FOUND_MAP.put("존재하지 않는 채팅방입니다.", "NOT_FOUND_EXCEPTION_002");
+        NOT_FOUND_MAP.put("존재하지 않는 요청자 SEQ입니다.", "NOT_FOUND_EXCEPTION_002");
 
         // ServerException
         SERVER_MAP.put("카카오 로그인 요청 시 토큰 정보 수집 오류가 발생했습니다.", "SERVER_EXCEPTION_001");

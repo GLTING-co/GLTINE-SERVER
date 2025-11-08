@@ -113,17 +113,9 @@ public class UserService {
             userImageRepository.saveAllUserImageUrls(userEntity.getUserSeq(), imageUrls);
 
             userEntity.updateUser(
-                    request.bio(),
-                    request.height(),
-                    request.weight(),
-                    request.job(),
-                    request.company(),
-                    request.school(),
-                    request.city(),
-                    request.smoking(),
-                    request.drinking(),
-                    request.religion(),
-                    request.open()
+                    request.bio(), request.height(), request.weight(),
+                    request.job(), request.company(), request.school(), request.city(),
+                    request.smoking(), request.drinking(), request.religion(), request.open()
             );
             userRepository.saveUserEntity(userEntity);
         } catch (OptimisticLockException e) {
@@ -157,22 +149,30 @@ public class UserService {
                 ));
 
         return new GetUserResponse(
-                userEntity.getName(),
-                userEntity.getBirth(),
-                userEntity.getGender(),
-                userEntity.getSexualType(),
-                userEntity.getRelationship(),
-                userEntity.getBio(),
-                userEntity.getHeight(),
-                userEntity.getJob(),
-                userEntity.getCompany(),
-                userEntity.getSchool(),
-                userEntity.getCity(),
-                userEntity.getSmoking(),
-                userEntity.getDrinking(),
-                userEntity.getReligion(),
-                userEntity.getOpen()
+                userEntity.getName(), userEntity.getBirth(), userEntity.getGender(),
+                userEntity.getSexualType(), userEntity.getRelationship(), userEntity.getBio(), userEntity.getHeight(),
+                userEntity.getJob(), userEntity.getCompany(), userEntity.getSchool(), userEntity.getCity(),
+                userEntity.getSmoking(), userEntity.getDrinking(), userEntity.getReligion(), userEntity.getOpen()
         );
+    }
+
+    /**
+     * 호스트 사용자와 조회 대상 사용자를 검증한 후 사용자 프로필 정보를 조회합니다.
+     *
+     * @param hostSeq 요청한 사용자 고유 식별자(PK) - 검증용
+     * @param userSeq 조회할 사용자 고유 식별자(PK)
+     * @return 사용자 프로필 정보 (이름, 생년월일, 성별, 성향, 관계 상태, 자기소개, 키, 직업, 회사, 학교, 도시, 흡연, 음주, 종교, 공개 여부)
+     */
+    @Transactional(readOnly = true)
+    public GetUserResponse get(Long hostSeq, Long userSeq) {
+        userRepository.findByUserSeq(hostSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 요청자 SEQ입니다.",
+                        getCode("존재하지 않는 요청자 SEQ입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        return get(userSeq);
     }
 
     /**

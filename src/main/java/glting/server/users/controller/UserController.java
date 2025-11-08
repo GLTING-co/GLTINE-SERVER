@@ -224,6 +224,22 @@ public class UserController {
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 
+    @GetMapping("/{userSeq}")
+    @Operation(summary = "SEQ 별 회원 정보 조회 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public ResponseEntity<BaseResponse<GetUserResponse>> get(
+            @RequestParam(value = "userSeq") @Schema(description = "조회하고자 하는 USER SEQ", example = "0L") Long userSeq,
+            HttpServletRequest httpServletRequest
+    ) {
+        Long hostSeq = (Long) httpServletRequest.getAttribute("userSeq");
+        GetUserResponse response = userService.get(hostSeq, userSeq);
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
+    }
+
     @PostMapping("/reissue-token")
     @Operation(summary = "토큰 재발급 API")
     @ApiResponses(value = {
