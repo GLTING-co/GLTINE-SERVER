@@ -45,7 +45,7 @@ public class RecommendationController {
                                                         @RequestParam(value = "size", defaultValue = "10") int size,
                                                         HttpServletRequest httpServletRequest) {
 
-        RecommendationFilterRequest filter  = new RecommendationFilterRequest(minAge,maxAge,sexualType,relationship,1L,page, size);
+        RecommendationFilterRequest filter  = new RecommendationFilterRequest(minAge,maxAge,sexualType,relationship,(Long) httpServletRequest.getAttribute("userSeq"),page, size);
 
         List<UserProfileResponse> response = recommendationService.getRecommendations(filter);
 
