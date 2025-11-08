@@ -44,6 +44,7 @@ public class ExceptionCodeMapper {
         UNAUTHORIZED_MAP.put("유효하지 않은 토큰입니다.", "UNAUTHORIZED_EXCEPTION_008");
         UNAUTHORIZED_MAP.put("유효하지 않은 Refresh Token입니다.", "UNAUTHORIZED_EXCEPTION_009");
         UNAUTHORIZED_MAP.put("JWT 토큰 처리 중 오류가 발생했습니다.", "UNAUTHORIZED_EXCEPTION_010");
+        UNAUTHORIZED_MAP.put("존재하지 않는 요청자 SEQ입니다.", "UNAUTHORIZED_EXCEPTION_011");
     }
 
     public static String getCode(String message, ExceptionType type) {
