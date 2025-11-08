@@ -1,15 +1,16 @@
 package glting.server.swipe.repository;
 
 import glting.server.swipe.entity.SwipeEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+@Repository
+@RequiredArgsConstructor
+public class SwipeRepository {
 
-public interface SwipeRepository extends JpaRepository<SwipeEntity, Long> {
+    private final SwipeJpaRepository swipeJpaRepository;
 
-    // 내가 스와이프한(to_user_seq) 사람 ID 목록
-    @Query("SELECT s.toUserSeq FROM SwipeEntity s WHERE s.fromUserSeq = :userSeq")
-    List<Long> findSwipedUserIds(@Param("userSeq") Long userSeq);
+    public void saveSwipe(SwipeEntity swipe){
+        swipeJpaRepository.save(swipe);
+    }
 }

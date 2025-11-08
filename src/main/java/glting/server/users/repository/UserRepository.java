@@ -87,8 +87,8 @@ public class UserRepository {
         return queryFactory
                 .selectFrom(user)
                 .leftJoin(swipe)
-                .on(swipe.toUserSeq.eq(user.userSeq)
-                        .and(swipe.fromUserSeq.eq(filter.user())))
+                .on(swipe.toUserSeq.userSeq.eq(user.userSeq)
+                        .and(swipe.fromUserSeq.userSeq.eq(filter.user())))
                 .where(
                         swipe.toUserSeq.isNull(),
                         user.userSeq.ne(filter.user()),

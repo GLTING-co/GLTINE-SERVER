@@ -1,0 +1,15 @@
+package glting.server.swipe.repository;
+
+import glting.server.swipe.entity.SwipeEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface SwipeJpaRepository extends JpaRepository<SwipeEntity, Long> {
+
+
+}
