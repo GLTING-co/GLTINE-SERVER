@@ -33,7 +33,7 @@ public class RecommendationService {
     public List<UserProfileResponse> getRecommendations(RecommendationFilterRequest filter) {
 
         // 0. 유효성 검사
-        userRepository.findByUserSeq(filter.user())
+        UserEntity userEntity = userRepository.findByUserSeq(filter.user())
                 .orElseThrow(() -> new NotFoundException(
                         HttpStatus.NOT_FOUND.value(),
                         "존재하지 않는 회원입니다.",
@@ -41,7 +41,7 @@ public class RecommendationService {
                 ));
 
         // 1. 스와이프한 사용자 제외 추천 목록 조회
-        List<UserEntity> recommendedBySwipeUser = userRepository.findRecommendedUsers(filter);
+        List<UserEntity> recommendedBySwipeUser = userRepository.findRecommendedUsers(filter, userEntity.getGender());
 
         // 2. 추천인 image 조회
         List<Long> userSeqs = recommendedBySwipeUser.stream()
