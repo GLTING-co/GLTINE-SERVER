@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static glting.server.swipe.controller.request.SwipeRequest.*;
+import static glting.server.swipe.controller.response.SwipeResponse.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,5 +44,22 @@ public class SwipeController {
         swipeService.dislike(fromUserSeq, dislikeRequest.toUserSeq());
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
+    }
+
+
+    @PostMapping("/like")
+    @Operation(summary = "좋아요 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않은 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public ResponseEntity<BaseResponse<LinkedResponse>> likeUser(HttpServletRequest httpServletRequest,
+                                                                 @RequestBody DislikeRequest dislikeRequest) {
+
+        Long fromUserSeq = (Long) httpServletRequest.getAttribute("userSeq");
+
+        LinkedResponse response = swipeService.like(fromUserSeq, dislikeRequest.toUserSeq());
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 }
