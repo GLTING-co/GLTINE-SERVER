@@ -78,7 +78,7 @@ public class UserRepository {
      * param : user 사용자 고유 식별자(PK), minAge, maxAge, sexualType, relationship
      * @return 사용자 엔티티 리스트
      */
-    public List<UserEntity> findRecommendedUsers(RecommendationFilterRequest filter) {
+    public List<UserEntity> findRecommendedUsers(RecommendationFilterRequest filter, String gender) {
 
         QUserEntity user = QUserEntity.userEntity;
 
@@ -92,6 +92,7 @@ public class UserRepository {
                 .where(
                         swipe.toUserSeq.isNull(),
                         user.userSeq.ne(filter.user()),
+                        user.gender.eq(gender),
                         ageBetween(filter.minAge(), filter.maxAge(), user),
                         sexualTypeEq(filter.sexualType(), user),
                         relationshipEq(filter.relationship(), user)
