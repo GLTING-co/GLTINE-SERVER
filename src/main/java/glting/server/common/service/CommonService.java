@@ -211,11 +211,12 @@ public class CommonService {
      */
     public List<String> uploadJPGFileList(List<MultipartFile> multipartFiles) {
         try {
-            String fileName = randomUUID().toString() + ".jpg";
 
             List<String> imageUrls = new ArrayList<>();
 
             for (MultipartFile multipartFile : multipartFiles) {
+                String fileName = randomUUID().toString() + ".jpg";
+
                 InputStream inputStream = multipartFile.getInputStream();
 
                 ObjectMetadata metadata = new ObjectMetadata();
