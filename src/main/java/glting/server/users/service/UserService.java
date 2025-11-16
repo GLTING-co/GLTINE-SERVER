@@ -227,7 +227,6 @@ public class UserService {
         String refreshToken = commonService.issueToken(userSeq, "REFRESH", social);
 
         commonService.saveToken(userSeq, "WHITE", accessToken);
-        commonService.saveToken(userSeq, "WHITE", refreshToken);
 
         return new ReIssueTokenResponse(accessToken, refreshToken);
     }
