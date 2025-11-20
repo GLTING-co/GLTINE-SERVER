@@ -7,6 +7,7 @@ import glting.server.users.entity.QUserEntity;
 import glting.server.users.entity.QUserImageEntity;
 import glting.server.users.entity.UserEntity;
 import glting.server.users.entity.UserImageEntity;
+import glting.server.users.filter.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -14,13 +15,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static glting.server.recommendation.controller.request.RecommendationRequest.*;
-import static glting.server.users.repository.filter.UserSpecification.*;
 
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
     private final UserJpaRepository userJpaRepository;
     private final JPAQueryFactory queryFactory;
+    private final UserSpecification userSpecification;
 
     /**
      * 사용자 엔티티를 저장합니다.
@@ -72,16 +73,14 @@ public class UserRepository {
     }
 
     /**
-     *
      * 스와이프한 사용자 제외 후 추천 목를을 조회합니다.
      * 각 검색 조건은 동적으로 처리
      * param : user 사용자 고유 식별자(PK), minAge, maxAge, sexualType, relationship
+     *
      * @return 사용자 엔티티 리스트
      */
     public List<UserEntity> findRecommendedUsers(RecommendationFilterRequest filter, String gender) {
-
         QUserEntity user = QUserEntity.userEntity;
-
         QSwipeEntity swipe = QSwipeEntity.swipeEntity;
 
         return queryFactory
@@ -92,23 +91,20 @@ public class UserRepository {
                 .where(
                         swipe.toUserSeq.isNull(),
                         user.userSeq.ne(filter.user()),
-                        user.gender.eq(gender),
-                        ageBetween(filter.minAge(), filter.maxAge(), user),
-                        sexualTypeEq(filter.sexualType(), user),
-                        relationshipEq(filter.relationship(), user)
+                        userSpecification.genderEq(gender, user),
+                        userSpecification.ageBetween(filter.minAge(), filter.maxAge(), user),
+                        userSpecification.sexualTypeEq(filter.sexualType(), user),
+                        userSpecification.relationshipEq(filter.relationship(), user)
                 )
                 .offset((long) filter.size() * filter.page())
                 .limit(filter.size())
                 .fetch();
-
     }
 
     public List<UserImageEntity> findUserImageByUserSeqs(List<Long> userSeqs) {
-
         return queryFactory
                 .selectFrom(QUserImageEntity.userImageEntity)
                 .where(QUserImageEntity.userImageEntity.userEntity.userSeq.in(userSeqs))
                 .fetch();
-
     }
 }

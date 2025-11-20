@@ -43,12 +43,12 @@ public class ChatController {
                     
                     <h3>1. 소켓 연결</h3>
                     ws://13.209.162.104:8080/ws-stomp
-                    <br>※ 반드시 JWT 토큰 포함해야 합니다.
                     
                     <br>
                     
                     <h3>2. 채팅 전송</h3>
                     엔드포인트: <b>/pub/chat/message</b>
+                    <br>※ 반드시 JWT 토큰 포함해야 합니다.
                     
                     ```
                     {
