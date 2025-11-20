@@ -26,12 +26,12 @@ public class ChatRoomEntity extends BaseTimeEntity {
     private String chatRoomSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_seq", nullable = false, unique = false)
-    private UserEntity hostEntity;
+    @JoinColumn(name = "user_a_seq", nullable = false, unique = false)
+    private UserEntity userA;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guest_seq", nullable = false, unique = false)
-    private UserEntity guestEntity;
+    @JoinColumn(name = "user_b_seq", nullable = false, unique = false)
+    private UserEntity userB;
 
     @Builder.Default
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")

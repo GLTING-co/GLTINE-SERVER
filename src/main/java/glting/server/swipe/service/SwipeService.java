@@ -84,15 +84,8 @@ public class SwipeService {
 
         chatRoomRepository.save(
                 ChatRoomEntity.builder()
-                        .hostEntity(fromUserEntity)
-                        .guestEntity(toUserEntity)
-                        .build()
-        );
-
-        chatRoomRepository.save(
-                ChatRoomEntity.builder()
-                        .hostEntity(toUserEntity)
-                        .guestEntity(fromUserEntity)
+                        .userA(fromUserEntity)
+                        .userB(toUserEntity)
                         .build()
         );
 

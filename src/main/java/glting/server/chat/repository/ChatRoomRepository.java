@@ -2,6 +2,7 @@ package glting.server.chat.repository;
 
 import glting.server.chat.entity.ChatRoomEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,14 +14,15 @@ public class ChatRoomRepository {
     private final ChatRoomJpaRepository chatRoomJpaRepository;
 
     /**
-     * 호스트 사용자 고유 식별자로 채팅방 목록을 조회합니다.
-     * JOIN FETCH를 사용하여 guestEntity와 hostEntity를 함께 로드합니다.
+     * 사용자 고유 식별자로 채팅방 목록을 페이징하여 조회합니다.
+     * JOIN FETCH를 사용하여 userA와 userB를 함께 로드합니다.
      *
-     * @param hostSeq 호스트 사용자 고유 식별자(PK)
+     * @param userSeq  사용자 고유 식별자(PK)
+     * @param pageable 페이징 정보
      * @return 채팅방 엔티티 목록 (생성일시 내림차순 정렬)
      */
-    public List<ChatRoomEntity> findAllByHostSeq(Long hostSeq) {
-        return chatRoomJpaRepository.findAllByHostSeq(hostSeq);
+    public List<ChatRoomEntity> findAllByUserSeq(Long userSeq, Pageable pageable) {
+        return chatRoomJpaRepository.findAllByUserSeq(userSeq, pageable);
     }
 
     /**

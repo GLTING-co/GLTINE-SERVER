@@ -62,12 +62,7 @@ public class ChatController {
                     /sub/chat/room/{chatRoomSeq}
                     """
     )
-    public ResponseEntity<BaseResponse<String>> description(HttpServletRequest httpServletRequest) {
-        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
-        String type = (String) httpServletRequest.getAttribute("type");
-        String accessToken = (String) httpServletRequest.getAttribute("accessToken");
-
-        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), userSeq + type + accessToken));
+    public void description() {
     }
 
     @GetMapping("/list/chat-room")
@@ -75,10 +70,15 @@ public class ChatController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
     })
-    public ResponseEntity<BaseResponse<List<GetChatRoomListResponse>>> chatRoomList(HttpServletRequest httpServletRequest) {
-        Long hostSeq = (Long) httpServletRequest.getAttribute("userSeq");
+    public ResponseEntity<BaseResponse<List<GetChatRoomListResponse>>> chatRoomList(
+            HttpServletRequest httpServletRequest,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size
+    ) {
+        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
+
         return ResponseEntity.ok()
-                .body(BaseResponse.ofSuccess(HttpStatus.OK.value(), chatService.chatRoomList(hostSeq)));
+                .body(BaseResponse.ofSuccess(HttpStatus.OK.value(), chatService.chatRoomList(userSeq, PageRequest.of(page, size))));
     }
 
     @GetMapping("/chat-room")

@@ -32,17 +32,18 @@ public class ChatService {
     private final SimpMessageSendingOperations messagingTemplate;
 
     /**
-     * 호스트 사용자의 채팅방 목록을 조회합니다.
+     * 사용자의 채팅방 목록을 페이징하여 조회합니다.
      *
-     * @param hostSeq 호스트 사용자 고유 식별자(PK)
+     * @param userSeq  사용자 고유 식별자(PK)
+     * @param pageable 페이징 정보
      * @return 채팅방 목록 (게스트 프로필 이미지, 공개 여부 포함)
      */
     @Transactional(readOnly = true)
-    public List<GetChatRoomListResponse> chatRoomList(Long hostSeq) {
-        return chatRoomRepository.findAllByHostSeq(hostSeq)
+    public List<GetChatRoomListResponse> chatRoomList(Long userSeq, Pageable pageable) {
+        return chatRoomRepository.findAllByUserSeq(userSeq, pageable)
                 .stream()
                 .map(chatRoom -> {
-                    UserEntity guest = chatRoom.getGuestEntity();
+                    UserEntity guest = chatRoom.getUserA().getUserSeq().equals(userSeq) ? chatRoom.getUserB() : chatRoom.getUserA();
                     String image = userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq()).getImage();
 
                     return new GetChatRoomListResponse(chatRoom.getChatRoomSeq(), image, guest.getOpen());
@@ -74,7 +75,7 @@ public class ChatService {
                         getCode("존재하지 않는 채팅방입니다.", ExceptionType.NOT_FOUND)
                 ));
 
-        UserEntity guest = chatRoom.getGuestEntity();
+        UserEntity guest = chatRoom.getUserA().getUserSeq().equals(hostSeq) ? chatRoom.getUserB() : chatRoom.getUserA();
         return new GetChatRoomResponse(
                 chatRoom.getChatRoomSeq(),
                 chatRoom.getCreatedAt(),
