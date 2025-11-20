@@ -33,4 +33,14 @@ public class ChatRoomRepository {
     public Optional<ChatRoomEntity> findByChatRoomSeq(String chatRoomSeq) {
         return Optional.ofNullable(chatRoomJpaRepository.findByChatRoomSeq(chatRoomSeq));
     }
+
+    /**
+     * 채팅방 엔티티를 저장합니다.
+     *
+     * @param chatRoomEntity 저장할 채팅방 엔티티
+     * @return 저장된 채팅방 엔티티
+     */
+    public ChatRoomEntity save(ChatRoomEntity chatRoomEntity) {
+        return chatRoomJpaRepository.save(chatRoomEntity);
+    }
 }

@@ -1,6 +1,8 @@
 package glting.server.swipe.service;
 
 
+import glting.server.chat.entity.ChatRoomEntity;
+import glting.server.chat.repository.ChatRoomRepository;
 import glting.server.exception.NotFoundException;
 import glting.server.exception.code.ExceptionCodeMapper;
 import glting.server.swipe.entity.SwipeEntity;
@@ -20,6 +22,7 @@ public class SwipeService {
 
     private final SwipeRepository swipeRepository;
     private final UserRepository userRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     public void dislike(Long fromUserSeq, Long toUserSeq) {
 
@@ -78,6 +81,20 @@ public class SwipeService {
                 .orElse(new SwipeEntity());
 
         boolean liked = toUserSwipeEntity.getLiked() != null;
+
+        chatRoomRepository.save(
+                ChatRoomEntity.builder()
+                        .hostEntity(fromUserEntity)
+                        .guestEntity(toUserEntity)
+                        .build()
+        );
+
+        chatRoomRepository.save(
+                ChatRoomEntity.builder()
+                        .hostEntity(toUserEntity)
+                        .guestEntity(fromUserEntity)
+                        .build()
+        );
 
         return new LinkedResponse(liked);
     }

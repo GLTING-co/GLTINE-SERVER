@@ -51,12 +51,12 @@ public class ChatService {
     }
 
     /**
-     * 호스트 사용자의 특정 채팅방 정보와 메시지 목록을 페이징하여 조회합니다.
+     * 호스트 사용자의 특정 채팅방 정보와 메시지 목록을 조회합니다.
      *
      * @param hostSeq     호스트 사용자 고유 식별자(PK)
      * @param chatRoomSeq 채팅방 고유 식별자(PK)
      * @param pageable    페이징 정보
-     * @return 채팅방 정보 및 페이징된 메시지 목록
+     * @return 채팅방 정보 및 메시지 목록
      */
     @Transactional(readOnly = true)
     public GetChatRoomResponse chatRoom(Long hostSeq, String chatRoomSeq, Pageable pageable) {
@@ -83,11 +83,13 @@ public class ChatService {
                 userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq()).getImage(),
                 guest.getOpen(),
                 chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq, pageable)
+                        .stream()
                         .map(msg -> new GetChatRoomResponse.Message(
                                 msg.getMessage(),
                                 msg.getCreatedAt(),
                                 msg.getSenderEntity().getUserSeq().equals(hostSeq)
                         ))
+                        .toList()
         );
     }
 
