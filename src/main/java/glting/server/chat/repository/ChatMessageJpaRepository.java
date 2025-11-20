@@ -1,7 +1,6 @@
 package glting.server.chat.repository;
 
 import glting.server.chat.entity.ChatMessageEntity;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,18 +14,8 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageEntit
     @Query("""
             SELECT cm
             FROM ChatMessageEntity cm
-            JOIN FETCH cm.senderEntity s
-            JOIN FETCH cm.receiverEntity r
             WHERE cm.chatRoomEntity.chatRoomSeq = :chatRoomSeq AND cm.deleted = false
             ORDER BY cm.createdAt DESC
             """)
-    List<ChatMessageEntity> findAllByChatRoomSeq(@Param("chatRoomSeq") String chatRoomSeq);
-
-    @Query("""
-            SELECT cm
-            FROM ChatMessageEntity cm
-            WHERE cm.chatRoomEntity.chatRoomSeq = :chatRoomSeq AND cm.deleted = false
-            ORDER BY cm.createdAt DESC
-            """)
-    Page<ChatMessageEntity> findAllByChatRoomSeq(@Param("chatRoomSeq") String chatRoomSeq, Pageable pageable);
+    List<ChatMessageEntity> findAllByChatRoomSeq(@Param("chatRoomSeq") String chatRoomSeq, Pageable pageable);
 }

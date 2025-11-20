@@ -4,7 +4,6 @@ import glting.server.base.BaseResponse;
 import glting.server.exception.BadRequestException;
 import glting.server.exception.handler.GlobalExceptionHandler;
 import glting.server.social.kakao.service.KakaoService;
-import glting.server.users.entity.UserEntity;
 import glting.server.social.naver.service.NaverService;
 import glting.server.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +37,7 @@ public class UserController {
     private final KakaoService kakaoService;
     private final NaverService naverService;
 
-    @GetMapping("/DESCRPTION")
+    @GetMapping("/DESCRIPTION")
     @Operation(
             operationId = "1",
             summary = "소셜 로그인/회원가입 API Description - 필독!",
@@ -212,7 +211,7 @@ public class UserController {
     }
 
     @GetMapping()
-    @Operation(summary = "회원 정보 개별 조회 API")
+    @Operation(summary = "본인 회원 정보 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),

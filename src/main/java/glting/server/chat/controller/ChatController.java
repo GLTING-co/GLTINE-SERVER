@@ -34,6 +34,42 @@ import static glting.server.chat.controller.response.ChatResponse.*;
 public class ChatController {
     private final ChatService chatService;
 
+    @GetMapping("/DESCRIPTION")
+    @Operation(
+            operationId = "1",
+            summary = "소켓 통신 안내 (필독)",
+            description = """
+                    <br>
+                    
+                    <h3>1. 소켓 연결</h3>
+                    ws://13.209.162.104:8080/ws-stomp
+                    <br>※ 반드시 JWT 토큰 포함해야 합니다.
+                    
+                    <br>
+                    
+                    <h3>2. 채팅 전송</h3>
+                    엔드포인트: <b>/pub/chat/message</b>
+                    
+                    ```
+                    {
+                        "chatRoomSeq": "String",
+                        "receiverSeq": "Long",
+                        "message": "String"
+                    }
+                    ```
+                    
+                    <h3>3. 구독</h3>
+                    /sub/chat/room/{chatRoomSeq}
+                    """
+    )
+    public ResponseEntity<BaseResponse<String>> description(HttpServletRequest httpServletRequest) {
+        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
+        String type = (String) httpServletRequest.getAttribute("type");
+        String accessToken = (String) httpServletRequest.getAttribute("accessToken");
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), userSeq + type + accessToken));
+    }
+
     @GetMapping("/list/chat-room")
     @Operation(summary = "회원별 채팅방 전체 API")
     @ApiResponses(value = {
