@@ -9,6 +9,7 @@ import glting.server.users.entity.UserEntity;
 import glting.server.users.repository.UserImageRepository;
 import glting.server.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -40,7 +41,8 @@ public class ChatService {
      */
     @Transactional(readOnly = true)
     public List<GetChatRoomListResponse> chatRoomList(Long userSeq, Pageable pageable) {
-        return chatRoomRepository.findAllByUserSeq(userSeq, pageable)
+        Page<ChatRoomEntity> chatRoomPage = chatRoomRepository.findAllByUserSeq(userSeq, pageable);
+        return chatRoomPage.getContent()
                 .stream()
                 .map(chatRoom -> {
                     UserEntity guest = chatRoom.getUserA().getUserSeq().equals(userSeq) ? chatRoom.getUserB() : chatRoom.getUserA();
@@ -76,6 +78,7 @@ public class ChatService {
                 ));
 
         UserEntity guest = chatRoom.getUserA().getUserSeq().equals(hostSeq) ? chatRoom.getUserB() : chatRoom.getUserA();
+        Page<ChatMessageEntity> messagePage = chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq, pageable);
         return new GetChatRoomResponse(
                 chatRoom.getChatRoomSeq(),
                 chatRoom.getCreatedAt(),
@@ -83,7 +86,7 @@ public class ChatService {
                 guest.getName(),
                 userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq()).getImage(),
                 guest.getOpen(),
-                chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq, pageable)
+                messagePage.getContent()
                         .stream()
                         .map(msg -> new GetChatRoomResponse.Message(
                                 msg.getMessage(),

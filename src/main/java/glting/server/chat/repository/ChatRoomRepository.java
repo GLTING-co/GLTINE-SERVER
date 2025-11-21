@@ -1,7 +1,12 @@
 package glting.server.chat.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import glting.server.chat.entity.ChatRoomEntity;
+import glting.server.chat.entity.QChatRoomEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChatRoomRepository {
     private final ChatRoomJpaRepository chatRoomJpaRepository;
+    private final JPAQueryFactory queryFactory;
 
     /**
      * 사용자 고유 식별자로 채팅방 목록을 페이징하여 조회합니다.
@@ -19,10 +25,33 @@ public class ChatRoomRepository {
      *
      * @param userSeq  사용자 고유 식별자(PK)
      * @param pageable 페이징 정보
-     * @return 채팅방 엔티티 목록 (생성일시 내림차순 정렬)
+     * @return 채팅방 엔티티 페이지 (생성일시 내림차순 정렬)
      */
-    public List<ChatRoomEntity> findAllByUserSeq(Long userSeq, Pageable pageable) {
-        return chatRoomJpaRepository.findAllByUserSeq(userSeq, pageable);
+    public Page<ChatRoomEntity> findAllByUserSeq(Long userSeq, Pageable pageable) {
+        QChatRoomEntity chatRoom = QChatRoomEntity.chatRoomEntity;
+
+        BooleanExpression condition = (chatRoom.userA.userSeq.eq(userSeq)
+                .or(chatRoom.userB.userSeq.eq(userSeq)))
+                .and(chatRoom.deleted.eq(false));
+
+        List<ChatRoomEntity> content = queryFactory
+                .selectFrom(chatRoom)
+                .distinct()
+                .join(chatRoom.userA).fetchJoin()
+                .join(chatRoom.userB).fetchJoin()
+                .where(condition)
+                .orderBy(chatRoom.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = queryFactory
+                .select(chatRoom.countDistinct())
+                .from(chatRoom)
+                .where(condition)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
     /**
@@ -33,7 +62,7 @@ public class ChatRoomRepository {
      * @return 채팅방 엔티티 (존재하지 않으면 Optional.empty())
      */
     public Optional<ChatRoomEntity> findByChatRoomSeq(String chatRoomSeq) {
-        return Optional.ofNullable(chatRoomJpaRepository.findByChatRoomSeq(chatRoomSeq));
+        return chatRoomJpaRepository.findByChatRoomSeq(chatRoomSeq);
     }
 
     /**
