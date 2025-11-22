@@ -91,10 +91,27 @@ public class CommonService {
             Date exp = body.getExpiration();
             long now = System.currentTimeMillis();
             long TTL = exp.getTime() - now;
+            
+            if (TTL <= 0) {
+                throw new ServerException(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Token expiration time is invalid or already expired",
+                        getCode("Token expiration time is invalid or already expired", ExceptionType.SERVER)
+                );
+            }
+            
             String key = "";
 
             if (type.equalsIgnoreCase("WHITE")) key = String.format(WHITE_KEY_FMT, userSeq);
             if (type.equalsIgnoreCase("BLACK")) key = String.format(BLACK_KEY_FMT, userSeq);
+
+            if (key.isEmpty()) {
+                throw new ServerException(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Invalid token type: " + type,
+                        getCode("Invalid token type", ExceptionType.SERVER)
+                );
+            }
 
             redisTemplate.opsForValue().set(
                     key,
@@ -102,6 +119,18 @@ public class CommonService {
                     TTL,
                     TimeUnit.MILLISECONDS
             );
+            
+            // 저장 확인
+            String savedValue = redisTemplate.opsForValue().get(key);
+            if (savedValue == null || !savedValue.equals(token)) {
+                throw new ServerException(
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Failed to save token to Redis",
+                        getCode("Failed to save token to Redis", ExceptionType.SERVER)
+                );
+            }
+        } catch (ServerException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServerException(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),

@@ -74,9 +74,14 @@ public class SecurityConfiguration {
 
                 // 운영자
                 "/admin/**",
+
+                // 회원
                 "/api/user-service/register",
                 "/api/user-service/login/**",
-                "/api/user-service/reissue-token/**"
+                "/api/user-service/reissue-token/**",
+
+                // 테스트
+                "/test/**"
 
         );
         return new JwtTokenFilter(commonService, permitAllEndpoints);
