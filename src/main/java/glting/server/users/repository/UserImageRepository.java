@@ -36,13 +36,8 @@ public class UserImageRepository {
         );
     }
 
-    /**
-     * 사용자 고유 식별자에 해당하는 모든 사용자 이미지를 삭제합니다. (Soft Delete)
-     *
-     * @param userSeq 사용자 고유 식별자(PK)
-     */
-    public void deleteAllByUserSeq(Long userSeq) {
-        userImageJpaRepository.deleteAllByUserSeq(userSeq);
+    public void deleteImages(List<String> images) {
+        userImageJpaRepository.deleteImages(images);
     }
 
     /**

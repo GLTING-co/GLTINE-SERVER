@@ -1,6 +1,7 @@
 package glting.server.users.controller.request;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class UserRequest {
     public record SocialLoginRequest(
@@ -35,7 +36,8 @@ public class UserRequest {
             String smoking,
             String drinking,
             String religion,
-            Boolean open
+            Boolean open,
+            List<String> removeImages
     ) {
     }
 
