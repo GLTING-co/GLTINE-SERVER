@@ -186,7 +186,7 @@ public class UserController {
     public ResponseEntity<BaseResponse<String>> update(
             HttpServletRequest httpServletRequest,
             @RequestPart(value = "request", required = false) UpdateUserRequest request,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images
+            @RequestPart(value = "images", required = false) List<MultipartFile> newImages
     ) {
         if (request == null) {
             throw new BadRequestException(
@@ -196,7 +196,7 @@ public class UserController {
             );
         }
 
-        if (images.isEmpty()) {
+        if (newImages.isEmpty()) {
             throw new BadRequestException(
                     HttpStatus.BAD_REQUEST.value(),
                     "요청 데이터 오류입니다.",
@@ -205,7 +205,7 @@ public class UserController {
         }
 
         Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
-        userService.update(userSeq, request, images);
+        userService.update(userSeq, request, newImages);
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
     }

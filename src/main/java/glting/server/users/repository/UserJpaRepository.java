@@ -10,5 +10,4 @@ import java.util.Optional;
 @Repository
 public interface UserJpaRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
 
-    Optional<UserEntity> findByUserSeq(Long UserSeq);
 }

@@ -94,12 +94,12 @@ public class UserService {
     /**
      * 사용자 프로필 정보를 업데이트합니다.
      *
-     * @param userSeq 사용자 고유 식별자(PK)
-     * @param request 업데이트할 사용자 정보 (bio, height, job, company, school, city, smoking, drinking, religion, open)
-     * @param images  새로운 프로필 이미지 파일 목록
+     * @param userSeq   사용자 고유 식별자(PK)
+     * @param request   업데이트할 사용자 정보 (bio, height, job, company, school, city, smoking, drinking, religion, open)
+     * @param newImages 새로운 프로필 이미지 파일 목록
      */
     @Transactional
-    public void update(Long userSeq, UpdateUserRequest request, List<MultipartFile> images) {
+    public void update(Long userSeq, UpdateUserRequest request, List<MultipartFile> newImages) {
         UserEntity userEntity = userRepository.findByUserSeq(userSeq)
                 .orElseThrow(() -> new NotFoundException(
                         HttpStatus.NOT_FOUND.value(),
@@ -108,8 +108,8 @@ public class UserService {
                 ));
 
         try {
-            userImageRepository.deleteAllByUserSeq(userSeq);
-            List<String> imageUrls = commonService.uploadJPGFileList(images);
+            userImageRepository.deleteImages(request.removeImages());
+            List<String> imageUrls = commonService.uploadJPGFileList(newImages);
             userImageRepository.saveAllUserImageUrls(userEntity.getUserSeq(), imageUrls);
 
             userEntity.updateUser(
