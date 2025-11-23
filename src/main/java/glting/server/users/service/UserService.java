@@ -152,7 +152,8 @@ public class UserService {
                 userEntity.getName(), userEntity.getBirth(), userEntity.getGender(),
                 userEntity.getSexualType(), userEntity.getRelationship(), userEntity.getBio(), userEntity.getHeight(),
                 userEntity.getJob(), userEntity.getCompany(), userEntity.getSchool(), userEntity.getCity(),
-                userEntity.getSmoking(), userEntity.getDrinking(), userEntity.getReligion(), userEntity.getOpen()
+                userEntity.getSmoking(), userEntity.getDrinking(), userEntity.getReligion(), userEntity.getOpen(),
+                userImageRepository.findAllImagesByUserSeq(userSeq)
         );
     }
 

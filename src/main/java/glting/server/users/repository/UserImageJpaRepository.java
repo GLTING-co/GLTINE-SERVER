@@ -29,4 +29,12 @@ public interface UserImageJpaRepository extends JpaRepository<UserImageEntity, I
             LIMIT 1
             """)
     UserImageEntity findRepresentImageByUserSeq(@Param("userSeq") Long userSeq);
+
+    @Query("""
+            SELECT ui.image
+            FROM UserImageEntity ui
+            WHERE ui.userEntity.userSeq = :userSeq AND ui.deleted = false
+            ORDER BY ui.userImageSeq DESC
+            """)
+    List<String> findAllImagesByUserSeq(@Param("userSeq") Long userSeq);
 }

@@ -31,9 +31,9 @@ public class UserResponse {
             String smoking,
             String drinking,
             String religion,
-            Boolean open
+            Boolean open,
+            List<String> images
     ) implements BaseUserInfo {
-
     }
 
     public record UserProfileResponse(
@@ -67,19 +67,33 @@ public class UserResponse {
 
     public interface BaseUserInfo {
         String name();
+
         LocalDate birth();
+
         String gender();
+
         String sexualType();
+
         String relationship();
+
         String bio();
+
         Integer height();
+
         String job();
+
         String company();
+
         String school();
+
         String city();
+
         String smoking();
+
         String drinking();
+
         String religion();
+
         Boolean open();
     }
 }
