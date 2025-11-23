@@ -26,7 +26,7 @@ public interface UserImageJpaRepository extends JpaRepository<UserImageEntity, I
             SELECT ui
             FROM UserImageEntity ui
             WHERE ui.userEntity.userSeq = :userSeq AND ui.deleted = false
-            ORDER BY ui.userImageSeq DESC
+            ORDER BY ui.userImageSeq ASC
             LIMIT 1
             """)
     Optional<UserImageEntity> findRepresentImageByUserSeq(@Param("userSeq") Long userSeq);
@@ -35,7 +35,7 @@ public interface UserImageJpaRepository extends JpaRepository<UserImageEntity, I
             SELECT ui.image
             FROM UserImageEntity ui
             WHERE ui.userEntity.userSeq = :userSeq AND ui.deleted = false
-            ORDER BY ui.userImageSeq DESC
+            ORDER BY ui.userImageSeq ASC
             """)
     List<String> findAllImagesByUserSeq(@Param("userSeq") Long userSeq);
 }
