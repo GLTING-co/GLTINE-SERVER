@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -47,7 +48,7 @@ public class UserImageRepository {
      * @param userSeq 사용자 고유 식별자(PK)
      * @return 대표 이미지 엔티티 (존재하지 않으면 null)
      */
-    public UserImageEntity findRepresentImageByUserSeq(Long userSeq) {
+    public Optional<UserImageEntity> findRepresentImageByUserSeq(Long userSeq) {
         return userImageJpaRepository.findRepresentImageByUserSeq(userSeq);
     }
 
