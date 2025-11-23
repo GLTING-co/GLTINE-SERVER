@@ -20,4 +20,8 @@ public class SwipeRepository {
     public Optional<SwipeEntity> findByFromUserSeq(UserEntity userEntity) {
         return swipeJpaRepository.findByFromUserSeq(userEntity);
     }
+
+    public Optional<SwipeEntity> findByFromUserSeqAndToUserSeq(UserEntity fromUser, UserEntity toUser) {
+        return swipeJpaRepository.findByFromUserSeqAndToUserSeq(fromUser, toUser);
+    }
 }

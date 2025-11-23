@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface SwipeJpaRepository extends JpaRepository<SwipeEntity, Long> {
 
     Optional<SwipeEntity> findByFromUserSeq(UserEntity userEntity);
+
+    Optional<SwipeEntity> findByFromUserSeqAndToUserSeq(UserEntity fromUser, UserEntity toUser);
 }

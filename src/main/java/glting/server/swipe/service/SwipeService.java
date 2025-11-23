@@ -5,6 +5,8 @@ import glting.server.chat.entity.ChatRoomEntity;
 import glting.server.chat.repository.ChatRoomRepository;
 import glting.server.exception.NotFoundException;
 import glting.server.exception.code.ExceptionCodeMapper;
+import glting.server.match.entity.MatchEntity;
+import glting.server.match.repository.MatchRepository;
 import glting.server.swipe.entity.SwipeEntity;
 import glting.server.swipe.repository.SwipeRepository;
 import glting.server.users.entity.UserEntity;
@@ -12,6 +14,8 @@ import glting.server.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 import static glting.server.exception.code.ExceptionCodeMapper.getCode;
 import static glting.server.swipe.controller.response.SwipeResponse.*;
@@ -22,6 +26,7 @@ public class SwipeService {
 
     private final SwipeRepository swipeRepository;
     private final UserRepository userRepository;
+    private final MatchRepository matchRepository;
     private final ChatRoomRepository chatRoomRepository;
 
     public void dislike(Long fromUserSeq, Long toUserSeq) {
@@ -51,7 +56,7 @@ public class SwipeService {
     }
 
 
-    public LinkedResponse like(Long fromUserSeq, Long toUserSeq) {
+    public MatchedResponse like(Long fromUserSeq, Long toUserSeq) {
 
         // 0. 유효성 검사
         UserEntity fromUserEntity = userRepository.findByUserSeq(fromUserSeq)
@@ -76,20 +81,28 @@ public class SwipeService {
                 .build());
 
         // 2. 매칭 여부 확인
-
-        SwipeEntity toUserSwipeEntity = swipeRepository.findByFromUserSeq(toUserEntity)
+        SwipeEntity matchedSwipe = swipeRepository.findByFromUserSeqAndToUserSeq(fromUserEntity, toUserEntity)
                 .orElse(new SwipeEntity());
 
-        boolean liked = toUserSwipeEntity.getLiked() != null;
+        boolean liked = Boolean.TRUE.equals(matchedSwipe.getLiked());
 
-        chatRoomRepository.save(
-                ChatRoomEntity.builder()
-                        .userA(fromUserEntity)
-                        .userB(toUserEntity)
-                        .build()
-        );
+        if (liked) {
 
-        return new LinkedResponse(liked);
+            matchRepository.saveMatch(MatchEntity.builder()
+                    .userA(toUserEntity)
+                    .userB(fromUserEntity)
+                    .matchedAt(LocalDateTime.now())
+                    .build());
+
+            chatRoomRepository.save(
+                    ChatRoomEntity.builder()
+                            .userA(fromUserEntity)
+                            .userB(toUserEntity)
+                            .build()
+            );
+        }
+
+        return new MatchedResponse(liked);
     }
 
 }

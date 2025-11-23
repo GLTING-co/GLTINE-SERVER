@@ -2,7 +2,7 @@ package glting.server.swipe.controller.request;
 
 public class SwipeRequest {
 
-    public record DislikeRequest(
+    public record MatchRequest(
             Long toUserSeq
     ) {
     }

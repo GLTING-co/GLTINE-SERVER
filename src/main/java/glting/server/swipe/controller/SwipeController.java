@@ -37,11 +37,11 @@ public class SwipeController {
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않은 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<String>> dislikeUser(HttpServletRequest httpServletRequest,
-                                                            @RequestBody DislikeRequest dislikeRequest) {
+                                                            @RequestBody MatchRequest matchRequest) {
 
         Long fromUserSeq = (Long) httpServletRequest.getAttribute("userSeq");
 
-        swipeService.dislike(fromUserSeq, dislikeRequest.toUserSeq());
+        swipeService.dislike(fromUserSeq, matchRequest.toUserSeq());
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
     }
@@ -53,12 +53,12 @@ public class SwipeController {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않은 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
-    public ResponseEntity<BaseResponse<LinkedResponse>> likeUser(HttpServletRequest httpServletRequest,
-                                                                 @RequestBody DislikeRequest dislikeRequest) {
+    public ResponseEntity<BaseResponse<MatchedResponse>> likeUser(HttpServletRequest httpServletRequest,
+                                                                  @RequestBody MatchRequest matchRequest) {
 
         Long fromUserSeq = (Long) httpServletRequest.getAttribute("userSeq");
 
-        LinkedResponse response = swipeService.like(fromUserSeq, dislikeRequest.toUserSeq());
+        MatchedResponse response = swipeService.like(fromUserSeq, matchRequest.toUserSeq());
 
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
