@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserImageJpaRepository extends JpaRepository<UserImageEntity, Integer> {
@@ -28,7 +29,7 @@ public interface UserImageJpaRepository extends JpaRepository<UserImageEntity, I
             ORDER BY ui.userImageSeq DESC
             LIMIT 1
             """)
-    UserImageEntity findRepresentImageByUserSeq(@Param("userSeq") Long userSeq);
+    Optional<UserImageEntity> findRepresentImageByUserSeq(@Param("userSeq") Long userSeq);
 
     @Query("""
             SELECT ui.image

@@ -4,8 +4,10 @@ import glting.server.chat.entity.ChatMessageEntity;
 import glting.server.chat.entity.ChatRoomEntity;
 import glting.server.chat.repository.ChatMessageRepository;
 import glting.server.chat.repository.ChatRoomRepository;
+import glting.server.exception.BadRequestException;
 import glting.server.exception.NotFoundException;
 import glting.server.users.entity.UserEntity;
+import glting.server.users.entity.UserImageEntity;
 import glting.server.users.repository.UserImageRepository;
 import glting.server.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +48,13 @@ public class ChatService {
                 .stream()
                 .map(chatRoom -> {
                     UserEntity guest = chatRoom.getUserA().getUserSeq().equals(userSeq) ? chatRoom.getUserB() : chatRoom.getUserA();
-                    String image = userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq()).getImage();
+                    String image = userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq())
+                            .map(UserImageEntity::getImage)
+                            .orElseThrow(() -> new BadRequestException(
+                                    HttpStatus.BAD_REQUEST.value(),
+                                    "이미지가 왜 없지? 없으면 안되는데 ~",
+                                    getCode("이미지가 왜 없지? 없으면 안되는데 ~", ExceptionType.BAD_REQUEST)
+                            ));
 
                     return new GetChatRoomListResponse(chatRoom.getChatRoomSeq(), image, guest.getOpen());
                 })
@@ -84,7 +92,13 @@ public class ChatService {
                 chatRoom.getCreatedAt(),
                 guest.getUserSeq(),
                 guest.getName(),
-                userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq()).getImage(),
+                userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq())
+                        .map(UserImageEntity::getImage)
+                        .orElseThrow(() -> new BadRequestException(
+                                HttpStatus.BAD_REQUEST.value(),
+                                "이미지가 왜 없지? 없으면 안되는데 ~",
+                                getCode("이미지가 왜 없지? 없으면 안되는데 ~", ExceptionType.BAD_REQUEST)
+                        )),
                 guest.getOpen(),
                 messagePage.getContent()
                         .stream()

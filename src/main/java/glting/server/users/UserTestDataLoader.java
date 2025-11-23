@@ -1,8 +1,9 @@
 package glting.server.users;
 
 import glting.server.users.entity.UserEntity;
+import glting.server.users.entity.UserImageEntity;
+import glting.server.users.repository.UserImageJpaRepository;
 import glting.server.users.repository.UserJpaRepository;
-import glting.server.users.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,16 +11,27 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class UserTestDataLoader {
 
     private final UserJpaRepository userJpaRepository;
+    private final UserImageJpaRepository userImageJpaRepository;
+
+    private static final List<String> DEFAULT_IMAGES = List.of(
+            "https://startwith-solu.s3.ap-northeast-2.amazonaws.com/086459d1-9035-4163-b40b-c61e774c34f4.jpg",
+            "https://startwith-solu.s3.ap-northeast-2.amazonaws.com/46ba0aad-b2d4-4acc-86bc-bfc2e0992450.jpg",
+            "https://startwith-solu.s3.ap-northeast-2.amazonaws.com/fe6392ed-3b91-4f77-8fbb-d7ef8d02ffc0.jpg",
+            "https://startwith-solu.s3.ap-northeast-2.amazonaws.com/64075650-bd31-4df8-98f2-ba95f173e941.jpg",
+            "https://startwith-solu.s3.ap-northeast-2.amazonaws.com/7bcb6252-0a3b-4951-8399-df5e951a2a4b.jpg",
+            "https://startwith-solu.s3.ap-northeast-2.amazonaws.com/fa66ef44-bf95-4df6-ac84-9155d019ae04.jpg"
+    );
 
     @PostConstruct
     public void init() {
-        if (userJpaRepository.count() > 0) return; // 이미 있으면 생략
+        if (userJpaRepository.count() > 0) return;
 
         List<UserEntity> users = new ArrayList<>();
 
@@ -93,6 +105,19 @@ public class UserTestDataLoader {
         users.add(UserEntity.builder().name("서은지").birth(LocalDate.of(1998, 5, 1)).gender("FEMALE").sexualType("LESBIAN").relationship("SINGLE").kakaoId("200000015L").deleted(false).build());
         users.add(UserEntity.builder().name("김하린").birth(LocalDate.of(1996, 9, 29)).gender("FEMALE").sexualType("LESBIAN").relationship("SINGLE").kakaoId("200000016L").deleted(false).build());
         users.add(UserEntity.builder().name("이소연").birth(LocalDate.of(1995, 12, 15)).gender("FEMALE").sexualType("LESBIAN").relationship("SINGLE").kakaoId("200000017L").deleted(false).build());
-        userJpaRepository.saveAll(users);
+
+        List<UserEntity> savedUsers = userJpaRepository.saveAll(users);
+        for (UserEntity user : savedUsers) {
+            List<UserImageEntity> images = DEFAULT_IMAGES.stream()
+                    .map(url -> UserImageEntity.builder()
+                            .userEntity(user)
+                            .image(url)
+                            .deleted(false)
+                            .build()
+                    )
+                    .collect(Collectors.toList());
+
+            userImageJpaRepository.saveAll(images);
+        }
     }
 }
