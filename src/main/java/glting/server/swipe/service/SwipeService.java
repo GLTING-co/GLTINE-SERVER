@@ -81,13 +81,9 @@ public class SwipeService {
                 .build());
 
         // 2. 매칭 여부 확인
-        SwipeEntity matchedSwipe = swipeRepository.findByFromUserSeqAndToUserSeq(fromUserEntity, toUserEntity)
-                .orElse(new SwipeEntity());
-
-        boolean liked = Boolean.TRUE.equals(matchedSwipe.getLiked());
+        boolean liked = swipeRepository.isMatch(fromUserSeq, toUserSeq);
 
         if (liked) {
-
             matchRepository.saveMatch(MatchEntity.builder()
                     .userA(toUserEntity)
                     .userB(fromUserEntity)
