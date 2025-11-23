@@ -50,4 +50,8 @@ public class UserImageRepository {
     public UserImageEntity findRepresentImageByUserSeq(Long userSeq) {
         return userImageJpaRepository.findRepresentImageByUserSeq(userSeq);
     }
+
+    public List<String> findAllImagesByUserSeq(Long userSeq) {
+        return userImageJpaRepository.findAllImagesByUserSeq(userSeq);
+    }
 }
