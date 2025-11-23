@@ -13,15 +13,11 @@ public class SwipeRepository {
 
     private final SwipeJpaRepository swipeJpaRepository;
 
-    public void saveSwipe(SwipeEntity swipe){
+    public void saveSwipe(SwipeEntity swipe) {
         swipeJpaRepository.save(swipe);
     }
 
-    public Optional<SwipeEntity> findByFromUserSeq(UserEntity userEntity) {
-        return swipeJpaRepository.findByFromUserSeq(userEntity);
-    }
-
-    public Optional<SwipeEntity> findByFromUserSeqAndToUserSeq(UserEntity fromUser, UserEntity toUser) {
-        return swipeJpaRepository.findByFromUserSeqAndToUserSeq(fromUser, toUser);
+    public boolean isMatch(Long fromUserSeq, Long toUserSeq) {
+        return swipeJpaRepository.isMatched(fromUserSeq, toUserSeq);
     }
 }
