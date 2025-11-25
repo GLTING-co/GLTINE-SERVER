@@ -3,6 +3,7 @@ package glting.server.swipe.service;
 
 import glting.server.chat.entity.ChatRoomEntity;
 import glting.server.chat.repository.ChatRoomRepository;
+import glting.server.exception.ConflictException;
 import glting.server.exception.NotFoundException;
 import glting.server.exception.code.ExceptionCodeMapper;
 import glting.server.match.entity.MatchEntity;
@@ -12,6 +13,7 @@ import glting.server.swipe.repository.SwipeRepository;
 import glting.server.users.entity.UserEntity;
 import glting.server.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -74,21 +76,40 @@ public class SwipeService {
                 ));
 
         // 1. 좋아요 저장
-        swipeRepository.saveSwipe(SwipeEntity.builder()
-                .fromUserSeq(fromUserEntity)
-                .toUserSeq(toUserEntity)
-                .liked(true)
-                .build());
+        try {
+            swipeRepository.saveSwipe(SwipeEntity.builder()
+                    .fromUserSeq(fromUserEntity)
+                    .toUserSeq(toUserEntity)
+                    .liked(true)
+                    .build());
+        } catch (DataIntegrityViolationException e) {
+            throw new ConflictException(
+                    HttpStatus.CONTINUE.value(),
+                    "이미 Swipe 정보가 존재합니다.",
+                    getCode("이미 Swipe 정보가 존재합니다.", ExceptionCodeMapper.ExceptionType.CONFLICT)
+            );
+        }
 
         // 2. 매칭 여부 확인
         boolean liked = swipeRepository.isMatch(fromUserSeq, toUserSeq);
 
         if (liked) {
-            matchRepository.saveMatch(MatchEntity.builder()
-                    .userA(toUserEntity)
-                    .userB(fromUserEntity)
-                    .matchedAt(LocalDateTime.now())
-                    .build());
+
+            try {
+                matchRepository.saveMatch(MatchEntity.builder()
+                        .userA(toUserEntity)
+                        .userB(fromUserEntity)
+                        .matchedAt(LocalDateTime.now())
+                        .build());
+
+            } catch (DataIntegrityViolationException e) {
+                throw new ConflictException(
+                        HttpStatus.CONTINUE.value(),
+                        "이미 매치된 정보가 존재합니다.",
+                        getCode("이미 매치된 정보가 존재합니다.", ExceptionCodeMapper.ExceptionType.CONFLICT)
+                );
+
+            }
 
             chatRoomRepository.save(
                     ChatRoomEntity.builder()
