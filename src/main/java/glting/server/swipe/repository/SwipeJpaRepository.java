@@ -12,12 +12,12 @@ public interface SwipeJpaRepository extends JpaRepository<SwipeEntity, Long> {
             SELECT CASE WHEN COUNT(s1) > 0 THEN true ELSE false END
             FROM SwipeEntity s1
             JOIN SwipeEntity s2
-              ON s1.fromUserSeq =:toUserSeq
-             AND s1.toUserSeq =:fromUserSeq
+              ON s1.fromUserSeq.userSeq = s2.toUserSeq.userSeq
+             AND s1.toUserSeq.userSeq = s2.fromUserSeq.userSeq
             WHERE s1.liked = true
               AND s2.liked = true
-              AND s1.fromUserSeq = :user1
-              AND s1.toUserSeq = :user2
+              AND s1.fromUserSeq.userSeq = :fromUserSeq
+              AND s1.toUserSeq.userSeq = :toUserSeq
             """)
     boolean isMatched(@Param("fromUserSeq") Long fromUserSeq, @Param("toUserSeq") Long toUserSeq);
 }
