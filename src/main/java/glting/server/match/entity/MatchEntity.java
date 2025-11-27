@@ -10,7 +10,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_match")
+@Table(
+        name = "MATCH",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"userA", "userB"})
+)
 @Getter
 @Builder
 @NoArgsConstructor
@@ -23,11 +26,11 @@ public class MatchEntity {
     private Long matchSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userA", nullable = false)
+    @JoinColumn(name = "user_a_seq", nullable = false)
     private UserEntity userA;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userB", nullable = false)
+    @JoinColumn(name = "user_b_seq", nullable = false)
     private UserEntity userB;
 
     @Column(name = "matched_at", nullable = false)

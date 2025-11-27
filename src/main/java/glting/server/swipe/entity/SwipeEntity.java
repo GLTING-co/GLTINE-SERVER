@@ -8,7 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "SWIPE")
+@Table(
+        name = "SWIPE",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"from_user_seq", "to_user_seq"})
+)
 @Getter
 @Builder
 @NoArgsConstructor

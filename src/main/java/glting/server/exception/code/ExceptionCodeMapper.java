@@ -22,7 +22,7 @@ public class ExceptionCodeMapper {
         CONFLICT_MAP.put("다른 요청이 먼저 수정했습니다. 다시 시도해주세요.", "CONFLICT_EXCEPTION_003");
         CONFLICT_MAP.put("이미 Swipe 정보가 존재합니다.", "CONFLICT_EXCEPTION_004");
         CONFLICT_MAP.put("이미 매치된 정보가 존재합니다.", "CONFLICT_EXCEPTION_005");
-
+        CONFLICT_MAP.put("이미 생성된 채팅방 입니다.", "CONFLICT_EXCEPTION_006");
         // NotFoundException
         NOT_FOUND_MAP.put("존재하지 않는 회원입니다.", "NOT_FOUND_EXCEPTION_001");
         NOT_FOUND_MAP.put("존재하지 않는 채팅방입니다.", "NOT_FOUND_EXCEPTION_002");
