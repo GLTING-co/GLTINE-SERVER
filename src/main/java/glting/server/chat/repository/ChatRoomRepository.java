@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -73,5 +74,9 @@ public class ChatRoomRepository {
      */
     public ChatRoomEntity save(ChatRoomEntity chatRoomEntity) {
         return chatRoomJpaRepository.save(chatRoomEntity);
+    }
+
+    public Optional<ChatRoomEntity> findByUserASeqAndUserBSeq(Long userASeq, Long userBSeq) {
+        return chatRoomJpaRepository.findByUserASeqAndUserBSeq(userASeq, userBSeq);
     }
 }

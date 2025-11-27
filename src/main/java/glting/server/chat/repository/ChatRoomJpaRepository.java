@@ -20,4 +20,11 @@ public interface ChatRoomJpaRepository extends JpaRepository<ChatRoomEntity, Str
             ORDER BY cr.createdAt DESC
             """)
     Optional<ChatRoomEntity> findByChatRoomSeq(@Param("chatRoomSeq") String chatRoomSeq);
+
+    @Query("""
+            SELECT cr
+            FROM ChatRoomEntity cr
+            WHERE cr.userA.userSeq = :userASeq AND cr.userB.userSeq = :userBSeq AND cr.deleted = false
+            """)
+    Optional<ChatRoomEntity> findByUserASeqAndUserBSeq(@Param("userASeq") Long userASeq, @Param("userBSeq") Long userBSeq);
 }
