@@ -223,7 +223,7 @@ public class UserController {
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 
-    @GetMapping("/{userSeq}")
+    @GetMapping("/user")
     @Operation(summary = "SEQ 별 회원 정보 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
