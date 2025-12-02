@@ -73,11 +73,12 @@ public class UserRepository {
     }
 
     /**
-     * 스와이프한 사용자 제외 후 추천 목를을 조회합니다.
-     * 각 검색 조건은 동적으로 처리
-     * param : user 사용자 고유 식별자(PK), minAge, maxAge, sexualType, relationship
+     * 스와이프한 사용자 제외 후 추천 목록을 조회합니다.
+     * 각 검색 조건은 동적으로 처리됩니다.
      *
-     * @return 사용자 엔티티 리스트
+     * @param filter 추천 필터 조건 (사용자 식별자, 최소/최대 나이, 성향, 관계 상태 등)
+     * @param gender 성별 필터 조건
+     * @return 추천 사용자 엔티티 목록
      */
     public List<UserEntity> findRecommendedUsers(RecommendationFilterRequest filter, String gender) {
         QUserEntity user = QUserEntity.userEntity;
@@ -101,6 +102,12 @@ public class UserRepository {
                 .fetch();
     }
 
+    /**
+     * 여러 사용자의 이미지 목록을 조회합니다.
+     *
+     * @param userSeqs 사용자 고유 식별자 목록
+     * @return 사용자 이미지 엔티티 목록
+     */
     public List<UserImageEntity> findUserImageByUserSeqs(List<Long> userSeqs) {
         return queryFactory
                 .selectFrom(QUserImageEntity.userImageEntity)

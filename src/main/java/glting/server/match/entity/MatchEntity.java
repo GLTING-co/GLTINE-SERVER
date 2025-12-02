@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "MATCH",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"userA", "userB"})
+        name = "MATCH_",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_a_seq", "user_b_seq"})
 )
 @Getter
 @Builder

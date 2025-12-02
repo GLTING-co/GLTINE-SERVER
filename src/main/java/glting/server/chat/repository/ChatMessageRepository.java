@@ -19,6 +19,7 @@ public class ChatMessageRepository {
 
     /**
      * 채팅방 고유 식별자로 채팅 메시지 목록을 페이징하여 조회합니다.
+     * JOIN FETCH를 사용하여 senderEntity를 함께 로드합니다.
      *
      * @param chatRoomSeq 채팅방 고유 식별자(PK)
      * @param pageable    페이징 정보
@@ -29,9 +30,10 @@ public class ChatMessageRepository {
 
         List<ChatMessageEntity> content = queryFactory
                 .selectFrom(chatMessage)
+                .join(chatMessage.senderEntity).fetchJoin()
                 .where(chatMessage.chatRoomEntity.chatRoomSeq.eq(chatRoomSeq)
                         .and(chatMessage.deleted.eq(false)))
-                .orderBy(chatMessage.createdAt.desc())
+                .orderBy(chatMessage.updatedAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -54,5 +56,15 @@ public class ChatMessageRepository {
      */
     public ChatMessageEntity save(ChatMessageEntity chatMessageEntity) {
         return chatMessageJpaRepository.save(chatMessageEntity);
+    }
+
+    /**
+     * 채팅방의 가장 최근 메시지를 조회합니다.
+     *
+     * @param chatRoomSeq 채팅방 고유 식별자(PK)
+     * @return 가장 최근 메시지 내용 (메시지가 없으면 null)
+     */
+    public String findRecentMessageByChatRoomSeq(String chatRoomSeq) {
+        return chatMessageJpaRepository.findRecentMessageByChatRoomSeq(chatRoomSeq);
     }
 }

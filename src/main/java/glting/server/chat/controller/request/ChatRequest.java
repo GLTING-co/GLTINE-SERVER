@@ -4,7 +4,10 @@ public class ChatRequest {
     public record ChatMessageRequest(
             String chatRoomSeq,
             Long receiverSeq,
-            String message
+            String message,
+            Boolean isRead,
+            Integer page,
+            Integer size
     ) {
     }
 }

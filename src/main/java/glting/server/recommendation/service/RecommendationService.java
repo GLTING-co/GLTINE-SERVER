@@ -26,9 +26,11 @@ public class RecommendationService {
 
 
     /**
+     * 사용자에게 추천할 사용자 목록을 조회합니다.
+     * 스와이프한 사용자는 제외하고, 필터 조건에 맞는 사용자만 추천합니다.
      *
-     * @param filter
-     * @return List<UserProfileResponse>
+     * @param filter 추천 필터 조건 (사용자 식별자, 최소/최대 나이, 성향, 관계 상태 등)
+     * @return 추천 사용자 프로필 목록 (이미지 URL 포함)
      */
     public List<UserProfileResponse> getRecommendations(RecommendationFilterRequest filter) {
 

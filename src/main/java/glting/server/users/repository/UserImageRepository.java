@@ -37,6 +37,11 @@ public class UserImageRepository {
         );
     }
 
+    /**
+     * 이미지 URL 목록에 해당하는 사용자 이미지를 삭제합니다.
+     *
+     * @param images 삭제할 이미지 URL 목록
+     */
     public void deleteImages(List<String> images) {
         userImageJpaRepository.deleteImages(images);
     }
@@ -52,6 +57,12 @@ public class UserImageRepository {
         return userImageJpaRepository.findRepresentImageByUserSeq(userSeq);
     }
 
+    /**
+     * 사용자의 모든 이미지 URL 목록을 조회합니다.
+     *
+     * @param userSeq 사용자 고유 식별자(PK)
+     * @return 이미지 URL 목록
+     */
     public List<String> findAllImagesByUserSeq(Long userSeq) {
         return userImageJpaRepository.findAllImagesByUserSeq(userSeq);
     }

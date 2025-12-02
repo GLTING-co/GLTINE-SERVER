@@ -16,10 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -54,12 +51,38 @@ public class ChatController {
                     {
                         "chatRoomSeq": "String",
                         "receiverSeq": "Long",
-                        "message": "String"
+                        "message": "String",
+                        "isRead": "Boolean",
+                        "page": "Integer",
+                        "size": "Integer"
                     }
                     ```
                     
                     <h3>3. 구독</h3>
-                    /sub/chat/room/{chatRoomSeq}
+                    1. /sub/chat/room/{chatRoomSeq} (채팅 전송)
+                    ```
+                    {
+                        "chatRoomSeq": "String",
+                        "receiverSeq": "Long",
+                        "message": "String",
+                        "isRead": "Boolean",
+                        "page": "Integer",
+                        "size": "Integer"
+                    }
+                    ```
+                    2. /sub/chat/room/{receiverSeq} (채팅방 리스트)
+                    ```
+                    {
+                        "receiverSeq": "Long",
+                        "chatRoomCreatedAt": "LocalDateTime",
+                        "guestSeq": "Long",
+                        "guestName": "String",
+                        "guestImage": "String",
+                        "open": "Boolean",
+                        "recentMessage": "String",
+                        "unReadNum": "Long"
+                    }
+                    ```
                     """
     )
     public void description() {
@@ -76,9 +99,9 @@ public class ChatController {
             @RequestParam(value = "size", defaultValue = "20") int size
     ) {
         Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
+        List<GetChatRoomListResponse> response = chatService.chatRoomList(userSeq, PageRequest.of(page, size));
 
-        return ResponseEntity.ok()
-                .body(BaseResponse.ofSuccess(HttpStatus.OK.value(), chatService.chatRoomList(userSeq, PageRequest.of(page, size))));
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 
     @GetMapping("/chat-room")
@@ -90,23 +113,56 @@ public class ChatController {
     })
     public ResponseEntity<BaseResponse<GetChatRoomResponse>> chatRoom(
             @RequestParam(value = "chatRoomSeq") @Schema(description = "채팅방 고유 SEQ - UUID") String chatRoomSeq,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "20") int size,
             HttpServletRequest httpServletRequest
     ) {
         Long hostSeq = (Long) httpServletRequest.getAttribute("userSeq");
-        return ResponseEntity.ok()
-                .body(BaseResponse.ofSuccess(HttpStatus.OK.value(),
-                        chatService.chatRoom(hostSeq, chatRoomSeq, PageRequest.of(page, size))));
+        GetChatRoomResponse response = chatService.chatRoom(hostSeq, chatRoomSeq);
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 
-    @MessageMapping("/chat/message")
-    @Operation(summary = "채팅 메시지 전송 API")
+    @GetMapping("/message")
+    @Operation(summary = "채팅방 메세지 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
             @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않는 채팅방입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
+    public ResponseEntity<BaseResponse<List<GetMessageResponse>>> getMessage(
+            @RequestParam(value = "chatRoomSeq") @Schema(description = "채팅방 고유 SEQ - UUID") String chatRoomSeq,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            HttpServletRequest httpServletRequest
+    ) {
+        Long hostSeq = (Long) httpServletRequest.getAttribute("userSeq");
+        List<GetMessageResponse> response = chatService.getMessage(hostSeq, chatRoomSeq, PageRequest.of(page, size));
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
+    }
+
+    @PutMapping("/message")
+    @Operation(
+            summary = "채팅 메세지 읽음 확인 API",
+            description = """
+                    채팅방 들어갔을 때 보내면 됨
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않는 채팅방입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
+    })
+    public ResponseEntity<BaseResponse<String>> readMessage(
+            @RequestParam(value = "chatRoomSeq") @Schema(description = "채팅방 고유 SEQ - UUID") String chatRoomSeq,
+            HttpServletRequest httpServletRequest
+    ) {
+        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
+        chatService.readMessage(userSeq, chatRoomSeq);
+
+        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
+    }
+
+    @MessageMapping("/chat/message")
     public void message(ChatMessageRequest request, SimpMessageHeaderAccessor headerAccessor) {
         Long senderSeq = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userSeq");
 

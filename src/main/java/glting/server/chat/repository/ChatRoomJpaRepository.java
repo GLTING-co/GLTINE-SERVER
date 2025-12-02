@@ -17,7 +17,7 @@ public interface ChatRoomJpaRepository extends JpaRepository<ChatRoomEntity, Str
             JOIN FETCH cr.userA a
             JOIN FETCH cr.userB b
             WHERE cr.chatRoomSeq = :chatRoomSeq AND cr.deleted = false
-            ORDER BY cr.createdAt DESC
+            ORDER BY cr.updatedAt DESC
             """)
     Optional<ChatRoomEntity> findByChatRoomSeq(@Param("chatRoomSeq") String chatRoomSeq);
 

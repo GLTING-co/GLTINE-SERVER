@@ -5,13 +5,17 @@ import glting.server.chat.entity.ChatRoomEntity;
 import glting.server.chat.repository.ChatMessageRepository;
 import glting.server.chat.repository.ChatRoomRepository;
 import glting.server.exception.BadRequestException;
+import glting.server.exception.ConflictException;
 import glting.server.exception.NotFoundException;
+import glting.server.exception.ServerException;
 import glting.server.users.entity.UserEntity;
 import glting.server.users.entity.UserImageEntity;
 import glting.server.users.repository.UserImageRepository;
 import glting.server.users.repository.UserRepository;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -55,8 +59,12 @@ public class ChatService {
                                     "이미지가 왜 없지? 없으면 안되는데 ~",
                                     getCode("이미지가 왜 없지? 없으면 안되는데 ~", ExceptionType.BAD_REQUEST)
                             ));
+                    String recentMessage = chatMessageRepository.findRecentMessageByChatRoomSeq(chatRoom.getChatRoomSeq());
 
-                    return new GetChatRoomListResponse(chatRoom.getChatRoomSeq(), image, guest.getOpen());
+                    return new GetChatRoomListResponse(
+                            chatRoom.getChatRoomSeq(), chatRoom.getUpdatedAt(), guest.getUserSeq(),
+                            guest.getName(), image, guest.getOpen(), recentMessage, chatRoom.getUnReadNum()
+                    );
                 })
                 .toList();
     }
@@ -66,11 +74,10 @@ public class ChatService {
      *
      * @param hostSeq     호스트 사용자 고유 식별자(PK)
      * @param chatRoomSeq 채팅방 고유 식별자(PK)
-     * @param pageable    페이징 정보
      * @return 채팅방 정보 및 메시지 목록
      */
     @Transactional(readOnly = true)
-    public GetChatRoomResponse chatRoom(Long hostSeq, String chatRoomSeq, Pageable pageable) {
+    public GetChatRoomResponse chatRoom(Long hostSeq, String chatRoomSeq) {
         userRepository.findByUserSeq(hostSeq)
                 .orElseThrow(() -> new NotFoundException(
                         HttpStatus.NOT_FOUND.value(),
@@ -86,10 +93,9 @@ public class ChatService {
                 ));
 
         UserEntity guest = chatRoom.getUserA().getUserSeq().equals(hostSeq) ? chatRoom.getUserB() : chatRoom.getUserA();
-        Page<ChatMessageEntity> messagePage = chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq, pageable);
         return new GetChatRoomResponse(
                 chatRoom.getChatRoomSeq(),
-                chatRoom.getCreatedAt(),
+                chatRoom.getUpdatedAt(),
                 guest.getUserSeq(),
                 guest.getName(),
                 userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq())
@@ -99,16 +105,84 @@ public class ChatService {
                                 "이미지가 왜 없지? 없으면 안되는데 ~",
                                 getCode("이미지가 왜 없지? 없으면 안되는데 ~", ExceptionType.BAD_REQUEST)
                         )),
-                guest.getOpen(),
-                messagePage.getContent()
-                        .stream()
-                        .map(msg -> new GetChatRoomResponse.Message(
-                                msg.getMessage(),
-                                msg.getCreatedAt(),
-                                msg.getSenderEntity().getUserSeq().equals(hostSeq)
-                        ))
-                        .toList()
+                guest.getOpen()
         );
+    }
+
+    /**
+     * 채팅방의 메시지 목록을 페이징하여 조회합니다.
+     *
+     * @param hostSeq     조회하는 사용자 고유 식별자(PK)
+     * @param chatRoomSeq 채팅방 고유 식별자(PK)
+     * @param pageable    페이징 정보
+     * @return 메시지 목록 (메시지 내용, 생성 시간, 호스트 여부)
+     */
+    @Transactional(readOnly = true)
+    public List<GetMessageResponse> getMessage(Long hostSeq, String chatRoomSeq, Pageable pageable) {
+        userRepository.findByUserSeq(hostSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 회원입니다.",
+                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        chatRoomRepository.findByChatRoomSeq(chatRoomSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 채팅방입니다.",
+                        getCode("존재하지 않는 채팅방입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        Page<ChatMessageEntity> messagePage = chatMessageRepository.findAllByChatRoomSeq(chatRoomSeq, pageable);
+
+        return messagePage.getContent()
+                .stream()
+                .map(chatMessage -> new GetMessageResponse(
+                        chatMessage.getMessage(),
+                        chatMessage.getCreatedAt(),
+                        chatMessage.getSenderEntity().getUserSeq().equals(hostSeq)
+                ))
+                .toList();
+    }
+
+    /**
+     * 채팅방의 읽지 않은 메시지 수를 초기화합니다.
+     *
+     * @param userSeq     사용자 고유 식별자(PK)
+     * @param chatRoomSeq 채팅방 고유 식별자(PK)
+     */
+    @Transactional
+    public void readMessage(Long userSeq, String chatRoomSeq) {
+        userRepository.findByUserSeq(userSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 회원입니다.",
+                        getCode("존재하지 않는 회원입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findByChatRoomSeq(chatRoomSeq)
+                .orElseThrow(() -> new NotFoundException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "존재하지 않는 채팅방입니다.",
+                        getCode("존재하지 않는 채팅방입니다.", ExceptionType.NOT_FOUND)
+                ));
+
+        try {
+            ChatRoomEntity updateChatRoomEntity = chatRoomEntity.resetUnReadNum();
+            chatRoomRepository.save(updateChatRoomEntity);
+        } catch (OptimisticLockException e) {
+            throw new ConflictException(
+                    HttpStatus.CONFLICT.value(),
+                    e.getMessage(),
+                    getCode(e.getMessage(), ExceptionType.CONFLICT)
+            );
+        } catch (Exception e) {
+            throw new ServerException(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    e.getMessage(),
+                    getCode(e.getMessage(), ExceptionType.SERVER)
+            );
+        }
     }
 
     /**
@@ -140,15 +214,55 @@ public class ChatService {
                         getCode("존재하지 않는 채팅방입니다.", ExceptionType.NOT_FOUND)
                 ));
 
+        try {
+            ChatRoomEntity updateChatRoomEntity = chatRoomEntity.increaseUnReadNum();
+            chatRoomRepository.save(updateChatRoomEntity);
+        } catch (OptimisticLockException e) {
+            throw new ConflictException(
+                    HttpStatus.CONFLICT.value(),
+                    e.getMessage(),
+                    getCode(e.getMessage(), ExceptionType.CONFLICT)
+            );
+        } catch (Exception e) {
+            throw new ServerException(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    e.getMessage(),
+                    getCode(e.getMessage(), ExceptionType.SERVER)
+            );
+        }
+
         ChatMessageEntity chatMessage = ChatMessageEntity.builder()
                 .chatRoomEntity(chatRoomEntity)
                 .message(request.message())
+                .isRead(request.isRead())
                 .senderEntity(senderEntity)
                 .receiverEntity(receiverEntity)
                 .build();
 
         chatMessageRepository.save(chatMessage);
-
         messagingTemplate.convertAndSend("/sub/chat/room/" + request.chatRoomSeq(), request);
+
+        Pageable pageable = PageRequest.of(request.page(), request.size());
+        Page<ChatRoomEntity> chatRoomPage = chatRoomRepository.findAllByUserSeq(request.receiverSeq(), pageable);
+        List<GetChatRoomListResponse> chatRoomListResponses = chatRoomPage.getContent()
+                .stream()
+                .map(chatRoom -> {
+                    UserEntity guest = chatRoom.getUserA().getUserSeq().equals(request.receiverSeq()) ? chatRoom.getUserB() : chatRoom.getUserA();
+                    String image = userImageRepository.findRepresentImageByUserSeq(guest.getUserSeq())
+                            .map(UserImageEntity::getImage)
+                            .orElseThrow(() -> new BadRequestException(
+                                    HttpStatus.BAD_REQUEST.value(),
+                                    "이미지가 왜 없지? 없으면 안되는데 ~",
+                                    getCode("이미지가 왜 없지? 없으면 안되는데 ~", ExceptionType.BAD_REQUEST)
+                            ));
+                    String recentMessage = chatMessageRepository.findRecentMessageByChatRoomSeq(chatRoom.getChatRoomSeq());
+
+                    return new GetChatRoomListResponse(
+                            chatRoom.getChatRoomSeq(), chatRoom.getUpdatedAt(), guest.getUserSeq(),
+                            guest.getName(), image, guest.getOpen(), recentMessage, chatRoom.getUnReadNum()
+                    );
+                })
+                .toList();
+        messagingTemplate.convertAndSend("/sub/chat/room/" + request.receiverSeq(), chatRoomListResponses);
     }
 }

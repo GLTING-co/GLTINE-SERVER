@@ -25,6 +25,9 @@ public class ChatRoomEntity extends BaseTimeEntity {
     @Column(name = "chat_room_seq", columnDefinition = "VARCHAR(36)")
     private String chatRoomSeq;
 
+    @Column(name = "un_read_num", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private Long unReadNum = 0L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_a_seq", nullable = false, unique = false)
     private UserEntity userA;
@@ -36,4 +39,19 @@ public class ChatRoomEntity extends BaseTimeEntity {
     @Builder.Default
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean deleted = false;
+
+    @Version
+    @Builder.Default
+    @Column(name = "version", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer version = 0;
+
+    public ChatRoomEntity increaseUnReadNum() {
+        this.unReadNum++;
+        return this;
+    }
+
+    public ChatRoomEntity resetUnReadNum() {
+        this.unReadNum = 0L;
+        return this;
+    }
 }

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class ChatRoomRepository {
                 .join(chatRoom.userA).fetchJoin()
                 .join(chatRoom.userB).fetchJoin()
                 .where(condition)
-                .orderBy(chatRoom.createdAt.desc())
+                .orderBy(chatRoom.updatedAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -76,6 +75,13 @@ public class ChatRoomRepository {
         return chatRoomJpaRepository.save(chatRoomEntity);
     }
 
+    /**
+     * 사용자 A와 사용자 B로 채팅방을 조회합니다.
+     *
+     * @param userASeq 사용자 A 고유 식별자(PK)
+     * @param userBSeq 사용자 B 고유 식별자(PK)
+     * @return 채팅방 엔티티 (존재하지 않으면 Optional.empty())
+     */
     public Optional<ChatRoomEntity> findByUserASeqAndUserBSeq(Long userASeq, Long userBSeq) {
         return chatRoomJpaRepository.findByUserASeqAndUserBSeq(userASeq, userBSeq);
     }

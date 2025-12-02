@@ -1,13 +1,17 @@
 package glting.server.chat.controller.response;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class ChatResponse {
     public record GetChatRoomListResponse(
             String chatRoomSeq,
-            String guestProfileImage,
-            Boolean open
+            LocalDateTime chatRoomCreatedAt,
+            Long guestSeq,
+            String guestName,
+            String guestImage,
+            Boolean open,
+            String recentMessage,
+            Long unReadNum
     ) {
     }
 
@@ -17,14 +21,14 @@ public class ChatResponse {
             Long guestSeq,
             String guestName,
             String guestImage,
-            Boolean open,
-            List<Message> messages
+            Boolean open
     ) {
-        public record Message(
-                String message,
-                LocalDateTime chatMessageCreatedAt,
-                Boolean isHost
-        ) {
-        }
+    }
+
+    public record GetMessageResponse(
+            String message,
+            LocalDateTime chatMessageCreatedAt,
+            Boolean isHost
+    ) {
     }
 }

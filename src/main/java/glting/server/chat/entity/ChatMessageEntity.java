@@ -32,6 +32,9 @@ public class ChatMessageEntity extends BaseTimeEntity {
     @Column(name = "message", nullable = false, unique = false, columnDefinition = "LONGTEXT")
     private String message;
 
+    @Column(name = "is_read", nullable = false, unique = false)
+    private Boolean isRead;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_seq", nullable = false, unique = false)
     private UserEntity senderEntity;
