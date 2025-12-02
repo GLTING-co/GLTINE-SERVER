@@ -55,6 +55,9 @@ public class SwipeController {
             @ApiResponse(responseCode = "CONFLICT_EXCEPTION_006", description = "이미 생성된 채팅방 입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
     })
     public ResponseEntity<BaseResponse<MatchedResponse>> likeUser(HttpServletRequest httpServletRequest,
+                                                                  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                                          description = "좋아요하려는 사용자 정보"
+                                                                  )
                                                                   @RequestBody MatchRequest matchRequest) {
 
         Long fromUserSeq = (Long) httpServletRequest.getAttribute("userSeq");
