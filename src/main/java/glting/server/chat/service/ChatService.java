@@ -215,8 +215,10 @@ public class ChatService {
                 ));
 
         try {
-            ChatRoomEntity updateChatRoomEntity = chatRoomEntity.increaseUnReadNum();
-            chatRoomRepository.save(updateChatRoomEntity);
+            if (!request.isRead()) {
+                ChatRoomEntity updateChatRoomEntity = chatRoomEntity.increaseUnReadNum();
+                chatRoomRepository.save(updateChatRoomEntity);
+            }
         } catch (OptimisticLockException e) {
             throw new ConflictException(
                     HttpStatus.CONFLICT.value(),
