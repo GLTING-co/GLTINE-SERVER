@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -66,5 +67,26 @@ public class ChatMessageRepository {
      */
     public String findRecentMessageByChatRoomSeq(String chatRoomSeq) {
         return chatMessageJpaRepository.findRecentMessageByChatRoomSeq(chatRoomSeq);
+    }
+
+    /**
+     * 채팅 메시지 고유 식별자로 채팅 메시지를 조회합니다.
+     *
+     * @param chatMessageSeq 채팅 메시지 고유 식별자(PK)
+     * @return 채팅 메시지 엔티티 (존재하지 않으면 Optional.empty())
+     */
+    public Optional<ChatMessageEntity> findByChatMessageSeq(String chatMessageSeq) {
+        return chatMessageJpaRepository.findByChatMessageSeq(chatMessageSeq);
+    }
+
+    /**
+     * 특정 메시지보다 먼저 생성된 같은 채팅방의 모든 메시지를 읽음 처리합니다.
+     *
+     * @param chatRoomSeq 채팅방 고유 식별자(PK)
+     * @param chatMessageSeq 기준이 되는 메시지 고유 식별자(PK)
+     * @return 업데이트된 메시지 수
+     */
+    public int markMessagesAsReadBefore(String chatRoomSeq, String chatMessageSeq) {
+        return chatMessageJpaRepository.markMessagesAsReadBefore(chatRoomSeq, chatMessageSeq);
     }
 }
