@@ -46,34 +46,24 @@ public class ChatController {
                     <h3>2. 채팅 전송</h3>
                     엔드포인트: <b>/pub/chat/message</b>
                     <br>※ 반드시 JWT 토큰 포함해야 합니다.
-                    
+                    <br>※ 읽음처리 소켓통신시 필수값: chatRoomSeq, ChatRoomMessageSeq, isRead
                     ```
                     {
                         "chatRoomSeq": "String",
                         "receiverSeq": "Long",
+                        "chatRoomMessageSeq": "String",
                         "message": "String",
-                        "isRead": "Boolean",
-                        "page": "Integer",
-                        "size": "Integer"
+                        "isRead": "Boolean"
                     }
                     ```
                     
                     <h3>3. 구독</h3>
-                    1. /sub/chat/room/{chatRoomSeq} (채팅 전송)
+                    1. /sub/chat/room/{receiverSeq}
                     ```
                     {
+                        "receiverSeq": "Long",
                         "chatRoomSeq": "String",
-                        "receiverSeq": "Long",
-                        "message": "String",
-                        "isRead": "Boolean",
-                        "page": "Integer",
-                        "size": "Integer"
-                    }
-                    ```
-                    2. /sub/chat/room/{receiverSeq} (채팅방 리스트)
-                    ```
-                    {
-                        "receiverSeq": "Long",
+                        "chatMessageSeq": "String",
                         "chatRoomCreatedAt": "LocalDateTime",
                         "guestSeq": "Long",
                         "guestName": "String",
