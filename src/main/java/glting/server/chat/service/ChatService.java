@@ -270,7 +270,10 @@ public class ChatService {
                             getCode("존재하지 않는 채팅 메세지입니다.", ExceptionType.NOT_FOUND)
                     ));
 
-            chatMessageRepository.markMessagesAsReadBefore(request.chatRoomMessageSeq(), chatMessageEntity.getChatMessageSeq());
+            chatMessageRepository.markMessagesAsReadBefore(
+                    chatMessageEntity.getChatRoomEntity().getChatRoomSeq(),
+                    chatMessageEntity.getChatMessageSeq()
+            );
         }
     }
 }

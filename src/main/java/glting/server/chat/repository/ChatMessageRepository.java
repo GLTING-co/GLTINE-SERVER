@@ -82,11 +82,10 @@ public class ChatMessageRepository {
     /**
      * 특정 메시지보다 먼저 생성된 같은 채팅방의 모든 메시지를 읽음 처리합니다.
      *
-     * @param chatRoomSeq 채팅방 고유 식별자(PK)
+     * @param chatRoomSeq    채팅방 고유 식별자(PK)
      * @param chatMessageSeq 기준이 되는 메시지 고유 식별자(PK)
-     * @return 업데이트된 메시지 수
      */
-    public int markMessagesAsReadBefore(String chatRoomSeq, String chatMessageSeq) {
-        return chatMessageJpaRepository.markMessagesAsReadBefore(chatRoomSeq, chatMessageSeq);
+    public void markMessagesAsReadBefore(String chatRoomSeq, String chatMessageSeq) {
+        chatMessageJpaRepository.markMessagesAsReadBefore(chatRoomSeq, chatMessageSeq);
     }
 }
