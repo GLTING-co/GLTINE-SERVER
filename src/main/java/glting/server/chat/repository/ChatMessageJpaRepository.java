@@ -27,7 +27,7 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageEntit
             """)
     Optional<ChatMessageEntity> findByChatMessageSeq(@Param("chatMessageSeq") String chatMessageSeq);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
             UPDATE ChatMessageEntity cm
             SET cm.isRead = true
@@ -40,5 +40,5 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageEntit
             AND cm.deleted = false
             AND cm.isRead = false
             """)
-    int markMessagesAsReadBefore(@Param("chatRoomSeq") String chatRoomSeq, @Param("chatMessageSeq") String chatMessageSeq);
+    void markMessagesAsReadBefore(@Param("chatRoomSeq") String chatRoomSeq, @Param("chatMessageSeq") String chatMessageSeq);
 }
