@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -65,5 +66,25 @@ public class UserImageRepository {
      */
     public List<String> findAllImagesByUserSeq(Long userSeq) {
         return userImageJpaRepository.findAllImagesByUserSeq(userSeq);
+    }
+
+    /**
+     * 여러 사용자의 대표 이미지를 일괄 조회합니다.
+     *
+     * @param userSeqs 사용자 고유 식별자 목록
+     * @return 사용자 SEQ를 키로 하는 대표 이미지 Map (이미지가 없으면 포함되지 않음)
+     */
+    public Map<Long, String> findRepresentImagesByUserSeqs(List<Long> userSeqs) {
+        if (userSeqs.isEmpty()) {
+            return Map.of();
+        }
+        
+        return userImageJpaRepository.findRepresentImagesByUserSeqs(userSeqs)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        ui -> ui.getUserEntity().getUserSeq(),
+                        UserImageEntity::getImage,
+                        (existing, replacement) -> existing
+                ));
     }
 }

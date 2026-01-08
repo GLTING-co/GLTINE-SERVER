@@ -1,7 +1,9 @@
 package glting.server.swipe.service;
 
 
+import glting.server.chat.entity.ChatMessageLogEntity;
 import glting.server.chat.entity.ChatRoomEntity;
+import glting.server.chat.repository.ChatMessageLogRepository;
 import glting.server.chat.repository.ChatRoomRepository;
 import glting.server.exception.ConflictException;
 import glting.server.exception.NotFoundException;
@@ -33,6 +35,7 @@ public class SwipeService {
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageLogRepository chatMessageLogRepository;
     private final RedissonClient redissonClient;
 
     /**
@@ -162,15 +165,21 @@ public class SwipeService {
                         );
                     });
 
-            chatRoomRepository.save(
+            ChatRoomEntity chatRoomEntity = chatRoomRepository.save(
                     ChatRoomEntity.builder()
-                            .unReadNum(0L)
                             .userA(userA)
                             .userB(userB)
                             .deleted(false)
                             .version(0)
                             .build()
             );
+
+            chatMessageLogRepository.save(
+                    ChatMessageLogEntity.builder()
+                            .chatRoomEntity(chatRoomEntity)
+                            .build()
+            );
+
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();

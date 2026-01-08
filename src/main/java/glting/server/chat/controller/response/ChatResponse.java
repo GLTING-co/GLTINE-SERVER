@@ -32,17 +32,8 @@ public class ChatResponse {
     ) {
     }
 
-    public record GetRecentChatMessageResponse(
-            Long receiverSeq,
-            String chatRoomSeq,
-            String chatMessageSeq,
-            LocalDateTime chatRoomCreatedAt,
-            Long guestSeq,
-            String guestName,
-            String guestImage,
-            Boolean open,
-            String recentMessage,
-            Long unReadNum
+    public record ChatReadMessageResponse(
+            String messageSeq
     ) {
     }
 }

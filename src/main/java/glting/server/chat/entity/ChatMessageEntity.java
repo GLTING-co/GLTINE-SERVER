@@ -17,13 +17,12 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @Getter
 @SuperBuilder
-@SQLDelete(sql = "UPDATE CHAT_MESSAGE SET deleted = true WHERE chat_message_seq = ?")
+@SQLDelete(sql = "UPDATE CHAT_MESSAGE SET deleted = true WHERE message_seq = ?")
 @Where(clause = "deleted = false")
 public class ChatMessageEntity extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "chat_message_seq", columnDefinition = "VARCHAR(36)")
-    private String chatMessageSeq;
+    @Column(name = "message_seq", nullable = false, length = 200)
+    private String messageSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_seq", nullable = false, unique = false)
@@ -31,9 +30,6 @@ public class ChatMessageEntity extends BaseTimeEntity {
 
     @Column(name = "message", nullable = false, unique = false, columnDefinition = "LONGTEXT")
     private String message;
-
-    @Column(name = "is_read", nullable = false, unique = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isRead = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_seq", nullable = false, unique = false)

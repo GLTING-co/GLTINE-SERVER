@@ -1,12 +1,14 @@
 package glting.server.chat.controller.request;
 
 public class ChatRequest {
-    public record ChatMessageRequest(
-            String chatRoomSeq,
-            String chatRoomMessageSeq,
-            Long receiverSeq,
+    public record ChatSendMessageRequest(
             String message,
-            Boolean isRead
+            String messageSeq
+    ) {
+    }
+
+    public record ChatReadMessageRequest(
+            String messageSeq
     ) {
     }
 }

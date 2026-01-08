@@ -17,7 +17,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @Getter
 @SuperBuilder
-@SQLDelete(sql = "UPDATE CHAT_ROOM SET deleted = true WHERE chat_room_seq = ?")
+@SQLDelete(sql = "UPDATE CHAT_ROOM SET deleted = true WHERE chat_room_seq = ? AND version = ?")
 @Where(clause = "deleted = false")
 public class ChatRoomEntity extends BaseTimeEntity {
     @Id
@@ -25,13 +25,12 @@ public class ChatRoomEntity extends BaseTimeEntity {
     @Column(name = "chat_room_seq", columnDefinition = "VARCHAR(36)")
     private String chatRoomSeq;
 
-    @Column(name = "un_read_num", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
-    private Long unReadNum = 0L;
-
+    // SEQ 작은 USER
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_a_seq", nullable = false, unique = false)
     private UserEntity userA;
 
+    // SEQ 큰 USER
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_b_seq", nullable = false, unique = false)
     private UserEntity userB;
@@ -44,14 +43,4 @@ public class ChatRoomEntity extends BaseTimeEntity {
     @Builder.Default
     @Column(name = "version", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     private Integer version = 0;
-
-    public ChatRoomEntity increaseUnReadNum() {
-        this.unReadNum++;
-        return this;
-    }
-
-    public ChatRoomEntity resetUnReadNum() {
-        this.unReadNum = 0L;
-        return this;
-    }
 }

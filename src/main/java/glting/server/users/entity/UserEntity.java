@@ -23,7 +23,7 @@ import static glting.server.exception.code.ExceptionCodeMapper.getCode;
 @NoArgsConstructor
 @Getter
 @SuperBuilder
-@SQLDelete(sql = "UPDATE USER SET deleted = true WHERE user_seq = ?")
+@SQLDelete(sql = "UPDATE USER SET deleted = true WHERE user_seq = ? AND version = ?")
 @Where(clause = "deleted = false")
 public class UserEntity extends BaseTimeEntity {
     @Id

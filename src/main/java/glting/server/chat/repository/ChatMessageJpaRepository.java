@@ -19,26 +19,4 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessageEntit
             LIMIT 1
             """)
     String findRecentMessageByChatRoomSeq(@Param("chatRoomSeq") String chatRoomSeq);
-
-    @Query("""
-            SELECT cm
-            FROM ChatMessageEntity cm
-            WHERE cm.chatMessageSeq = :chatMessageSeq AND cm.deleted = false
-            """)
-    Optional<ChatMessageEntity> findByChatMessageSeq(@Param("chatMessageSeq") String chatMessageSeq);
-
-    @Modifying(clearAutomatically = true)
-    @Query("""
-            UPDATE ChatMessageEntity cm
-            SET cm.isRead = true
-            WHERE cm.chatRoomEntity.chatRoomSeq = :chatRoomSeq
-            AND cm.createdAt <= (
-                SELECT cm2.createdAt
-                FROM ChatMessageEntity cm2
-                WHERE cm2.chatMessageSeq = :chatMessageSeq
-            )
-            AND cm.deleted = false
-            AND cm.isRead = false
-            """)
-    void markMessagesAsReadBefore(@Param("chatRoomSeq") String chatRoomSeq, @Param("chatMessageSeq") String chatMessageSeq);
 }

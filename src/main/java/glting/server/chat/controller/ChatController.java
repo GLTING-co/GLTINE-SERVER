@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 
-import static glting.server.chat.controller.request.ChatRequest.ChatMessageRequest;
+import static glting.server.chat.controller.request.ChatRequest.*;
+import static glting.server.chat.controller.request.ChatRequest.ChatSendMessageRequest;
 import static glting.server.chat.controller.response.ChatResponse.*;
 
 @RestController
@@ -38,39 +40,66 @@ public class ChatController {
             description = """
                     <br>
                     
-                    <h3>1. 소켓 연결</h3>
+                    <h3>소켓 연결</h3>
                     ws://13.209.162.104:8080/ws-stomp
+                    <br>
+                    ※ 반드시 JWT 토큰 포함해야 합니다.
                     
                     <br>
                     
-                    <h3>2. 채팅 전송</h3>
-                    엔드포인트: <b>/pub/chat/message</b>
-                    <br>※ 반드시 JWT 토큰 포함해야 합니다.
-                    <br>※ 읽음처리 소켓통신시 필수값: chatRoomSeq, ChatRoomMessageSeq, isRead
+                    <h3>채팅 전송</h3>
+                    <b>[pub]</b> -- /pub/chat/message/{chatRoomSeq}
                     ```
                     {
-                        "chatRoomSeq": "String",
-                        "receiverSeq": "Long",
-                        "chatRoomMessageSeq": "String",
                         "message": "String",
-                        "isRead": "Boolean"
+                        "messageSeq": "String"
                     }
                     ```
                     
-                    <h3>3. 구독</h3>
-                    1. /sub/chat/room/{receiverSeq}
+                    <br>
+                    
+                    <b>[sub]</b> -- /sub/chat/message/{chatRoomSeq}
                     ```
                     {
-                        "receiverSeq": "Long",
-                        "chatRoomSeq": "String",
-                        "chatMessageSeq": "String",
-                        "chatRoomCreatedAt": "LocalDateTime",
-                        "guestSeq": "Long",
-                        "guestName": "String",
-                        "guestImage": "String",
-                        "open": "Boolean",
-                        "recentMessage": "String",
-                        "unReadNum": "Long"
+                        "message": "String",
+                        "messageSeq": "String"
+                    }
+                    ```
+                    
+                    <br>
+                    
+                    <b>[sub]</b> -- /sub/chat/list/{receiverSeq}
+                    ```
+                    [
+                        {
+                            "chatRoomSeq": "String",
+                            "chatRoomCreatedAt": "LocalDateTime",
+                            "guestSeq": "Long",
+                            "guestName": "String",
+                            "guestImage": "String",
+                            "open": "Boolean",
+                            "recentMessage": "String",
+                            "unReadNum": "Long"
+                        }
+                    ]
+                    ```
+                    
+                    <br>
+                    
+                    <h3>채팅 읽음 전송</h3>
+                    <b>[pub]</b> -- /pub/chat/{chatRoomSeq}/message/read
+                    ```
+                    {
+                        "messageSeq": "String"
+                    }
+                    ```
+                    
+                    <br>
+                    
+                    <b>[sub]</b> -- /sub/chat/{chatRoomSeq}/message/read
+                    ```
+                    {
+                        "messageSeq": "String"
                     }
                     ```
                     """
@@ -130,32 +159,17 @@ public class ChatController {
         return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), response));
     }
 
-    @PutMapping("/message")
-    @Operation(
-            summary = "채팅 메세지 읽음 확인 API",
-            description = """
-                    채팅방 들어갔을 때 보내면 됨
-                    """
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "SUCCESS", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_001", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
-            @ApiResponse(responseCode = "NOT_FOUND_EXCEPTION_002", description = "존재하지 않는 채팅방입니다.", content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ErrorResponse.class))),
-    })
-    public ResponseEntity<BaseResponse<String>> readMessage(
-            @RequestParam(value = "chatRoomSeq") @Schema(description = "채팅방 고유 SEQ - UUID") String chatRoomSeq,
-            HttpServletRequest httpServletRequest
-    ) {
-        Long userSeq = (Long) httpServletRequest.getAttribute("userSeq");
-        chatService.readMessage(userSeq, chatRoomSeq);
-
-        return ResponseEntity.ok().body(BaseResponse.ofSuccess(HttpStatus.OK.value(), "SUCCESS"));
-    }
-
-    @MessageMapping("/chat/message")
-    public void message(ChatMessageRequest request, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("/chat/message/{chatRoomSeq}")
+    public void sendMessage(@DestinationVariable String chatRoomSeq, ChatSendMessageRequest request, SimpMessageHeaderAccessor headerAccessor) {
         Long senderSeq = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userSeq");
 
-        chatService.sendMessage(senderSeq, request);
+        chatService.sendMessage(senderSeq, chatRoomSeq, request);
+    }
+
+    @MessageMapping("/chat/{chatRoomSeq}/message/read")
+    public void readMessage(@DestinationVariable String chatRoomSeq, ChatReadMessageRequest request, SimpMessageHeaderAccessor headerAccessor) {
+        Long senderSeq = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userSeq");
+
+        chatService.readMessage(senderSeq, chatRoomSeq, request);
     }
 }
