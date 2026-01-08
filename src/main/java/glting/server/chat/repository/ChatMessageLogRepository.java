@@ -1,6 +1,5 @@
 package glting.server.chat.repository;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import glting.server.chat.entity.ChatMessageLogEntity;
 import glting.server.chat.entity.ChatRoomEntity;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
 @Repository
 @RequiredArgsConstructor
 public class ChatMessageLogRepository {
-    private final JPAQueryFactory queryFactory;
     private final ChatMessageLogJpaRepository messageReadLogJpaRepository;
 
     public ChatMessageLogEntity save(ChatMessageLogEntity chatMessageLogEntity) {

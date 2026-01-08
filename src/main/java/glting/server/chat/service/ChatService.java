@@ -23,10 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static glting.server.chat.controller.request.ChatRequest.*;
-import static glting.server.chat.controller.request.ChatRequest.ChatSendMessageRequest;
 import static glting.server.chat.controller.response.ChatResponse.*;
 import static glting.server.exception.code.ExceptionCodeMapper.*;
 import static glting.server.exception.code.ExceptionCodeMapper.getCode;
