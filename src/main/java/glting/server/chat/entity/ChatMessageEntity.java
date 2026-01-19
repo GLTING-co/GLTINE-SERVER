@@ -21,6 +21,7 @@ import org.hibernate.annotations.Where;
 @Where(clause = "deleted = false")
 public class ChatMessageEntity extends BaseTimeEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "message_seq", nullable = false, length = 200)
     private String messageSeq;
 
